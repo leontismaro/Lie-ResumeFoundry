@@ -1,0 +1,34 @@
+---
+interface SkillGroup {
+  name: string;
+  items: string[];
+}
+
+interface Props {
+  title: string;
+  summary?: string;
+  groups: SkillGroup[];
+}
+
+const { title, summary, groups } = Astro.props;
+---
+
+<section class:list={['print-section', 'print-section-skills']}>
+  <header class="print-section-header">
+    <h2 class="print-section-title">{title}</h2>
+    {summary && <p class="print-section-summary">{summary}</p>}
+  </header>
+
+  <div class="print-section-body">
+    <div class="print-skill-grid">
+      {
+        groups.map((group) => (
+          <>
+            <h3 class="print-skill-name">{group.name}</h3>
+            <p class="print-skill-items">{group.items.join(' · ')}</p>
+          </>
+        ))
+      }
+    </div>
+  </div>
+</section>

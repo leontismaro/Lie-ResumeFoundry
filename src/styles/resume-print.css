@@ -1,0 +1,360 @@
+@page {
+  size: A4;
+  margin: 9mm 10mm 11mm;
+}
+
+:root {
+  --paper: #ffffff;
+  --ink: #17313e;
+  --muted: #5c7482;
+  --line: rgba(23, 49, 62, 0.14);
+  --accent: #1f7da8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.print-page {
+  padding: 12px 0 28px;
+}
+
+.print-sheet {
+  width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto;
+  padding: 9mm 10mm 11mm;
+  background: var(--paper);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+}
+
+.print-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: 5mm;
+  padding-bottom: 5mm;
+  border-bottom: 1px solid var(--line);
+  align-items: start;
+}
+
+.print-hero-kicker {
+  margin: 0 0 2mm;
+  color: var(--accent);
+  font-size: 10.5pt;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.print-hero-title {
+  margin: 0;
+  font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  font-size: 32.5pt;
+  line-height: 0.98;
+}
+
+.print-hero-role {
+  margin: 2mm 0 0;
+  color: var(--accent);
+  font-size: 13.25pt;
+  font-weight: 700;
+}
+
+.print-hero-summary {
+  margin: 3mm 0 0;
+  max-width: 34em;
+  color: var(--muted);
+  font-size: 11.4pt;
+}
+
+.print-flow {
+  margin-top: 5mm;
+}
+
+.print-flow .print-section + .print-section {
+  margin-top: 4.5mm;
+}
+
+@media screen and (max-width: 900px) {
+  .print-page {
+    padding: 0;
+  }
+
+  .print-sheet {
+    width: 100%;
+    min-height: auto;
+    padding: 20px 16px 32px;
+  }
+
+  .print-hero {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media print {
+  .print-hero-meta {
+    margin-top: 3.5mm;
+  }
+
+  .print-page {
+    padding: 0;
+  }
+
+  .print-sheet {
+    width: auto;
+    min-height: auto;
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
+  }
+
+}
+
+body.glass-print-body {
+  margin: 0;
+  min-height: 100vh;
+  background: #e8f4fb;
+  color: var(--ink);
+  font-family: "Avenir Next", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  line-height: 1.42;
+}
+
+body.glass-print-body .print-page {
+  padding: 12px 0 28px;
+}
+
+body.glass-print-body .print-sheet {
+  width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto;
+  padding: 9mm 10mm 11mm;
+  background: var(--paper);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+}
+
+body.glass-print-body .print-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: 5mm;
+  padding-bottom: 5mm;
+  border-bottom: 1px solid var(--line);
+  align-items: start;
+}
+
+body.glass-print-body .print-hero-kicker {
+  color: var(--accent);
+}
+
+body.glass-print-body .print-hero-role {
+  color: var(--accent);
+}
+
+body.glass-print-body .print-hero-summary {
+  color: var(--muted);
+}
+
+body.glass-print-body .profile-meta-grid-print {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.2mm;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+body.glass-print-body .profile-meta-grid-print .profile-meta-item {
+  display: grid;
+  grid-template-columns: 24mm 1fr;
+  align-items: baseline;
+  column-gap: 2mm;
+  min-width: 0;
+  line-height: 1.35;
+  break-inside: avoid;
+}
+
+body.glass-print-body .profile-meta-grid-print .profile-meta-label {
+  display: block;
+  margin-bottom: 0;
+  color: var(--muted);
+  font-size: 8.8pt;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+body.glass-print-body .profile-meta-grid-print .profile-meta-value {
+  display: block;
+  color: var(--ink);
+  text-decoration: none;
+  white-space: normal;
+  font-weight: 500;
+  min-width: 0;
+}
+
+body.glass-print-body .profile-meta-grid-print .profile-meta-value[href] {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+body.glass-print-body .print-flow {
+  margin-top: 5mm;
+}
+
+body.glass-print-body .print-flow .print-section + .print-section {
+  margin-top: 4.5mm;
+}
+
+body.glass-print-body .print-section {
+  padding-top: 0.5mm;
+}
+
+body.glass-print-body .print-section-header {
+  padding-bottom: 1.8mm;
+  border-bottom: 1px solid var(--line);
+  break-after: avoid;
+}
+
+body.glass-print-body .print-section-title {
+  margin: 0;
+  font-size: 14.45pt;
+  line-height: 1.1;
+}
+
+body.glass-print-body .print-section-summary,
+body.glass-print-body .print-section-body blockquote,
+body.glass-print-body .print-skill-items {
+  color: var(--muted);
+}
+
+body.glass-print-body .print-section-summary {
+  margin: 1.2mm 0 0;
+  font-size: 10.25pt;
+}
+
+body.glass-print-body .print-section-body {
+  font-size: 10.95pt;
+}
+
+body.glass-print-body .print-section-body > :first-child {
+  margin-top: 2mm;
+}
+
+body.glass-print-body .print-section-body > :last-child {
+  margin-bottom: 0;
+}
+
+body.glass-print-body .print-section-body h3 {
+  margin: 2.6mm 0 1mm;
+  font-size: 11.65pt;
+  line-height: 1.28;
+  break-after: avoid;
+}
+
+body.glass-print-body .print-section-body p,
+body.glass-print-body .print-section-body ul,
+body.glass-print-body .print-section-body ol,
+body.glass-print-body .print-section-body pre,
+body.glass-print-body .print-section-body blockquote {
+  margin: 1.2mm 0;
+}
+
+body.glass-print-body .print-section-body ul,
+body.glass-print-body .print-section-body ol {
+  padding-left: 3.8mm;
+}
+
+body.glass-print-body .print-section-body li + li {
+  margin-top: 0.7mm;
+}
+
+body.glass-print-body .print-section-body a {
+  color: inherit;
+  text-decoration: none;
+}
+
+body.glass-print-body .print-section-body code {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.92em;
+}
+
+body.glass-print-body .print-section-body pre {
+  padding: 1.8mm;
+  border: 1px solid var(--line);
+  border-radius: 2mm;
+  overflow-x: auto;
+  white-space: pre-wrap;
+}
+
+body.glass-print-body .print-section-body pre code {
+  background: transparent;
+}
+
+body.glass-print-body .print-section-body blockquote {
+  padding-left: 2.4mm;
+  border-left: 1mm solid rgba(22, 63, 77, 0.2);
+}
+
+body.glass-print-body .print-skill-grid {
+  display: grid;
+  grid-template-columns: 34mm 1fr;
+  column-gap: 4mm;
+  row-gap: 1.2mm;
+  align-items: start;
+}
+
+body.glass-print-body .print-skill-name {
+  margin: 0;
+  font-size: 10.85pt;
+  line-height: 1.34;
+  color: var(--ink);
+}
+
+body.glass-print-body .print-skill-items {
+  margin: 0;
+  font-size: 10.75pt;
+  line-height: 1.46;
+}
+
+@media screen and (max-width: 900px) {
+  body.glass-print-body .print-page {
+    padding: 0;
+  }
+
+  body.glass-print-body .print-sheet {
+    width: 100%;
+    min-height: auto;
+    padding: 20px 16px 32px;
+  }
+
+  body.glass-print-body .print-hero,
+  body.glass-print-body .profile-meta-grid-print {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media print {
+  body.glass-print-body {
+    background: #ffffff;
+  }
+
+  body.glass-print-body .profile-meta-grid-print {
+    grid-template-columns: 1fr;
+  }
+
+  body.glass-print-body .print-section {
+    break-inside: auto;
+    page-break-inside: auto;
+  }
+
+  body.glass-print-body .print-page {
+    padding: 0;
+  }
+
+  body.glass-print-body .print-sheet {
+    width: auto;
+    min-height: auto;
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
+  }
+}

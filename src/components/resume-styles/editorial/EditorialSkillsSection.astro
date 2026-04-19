@@ -1,0 +1,22 @@
+---
+import type { ResumeSkillGroup } from '../../../lib/resume-skill-groups';
+
+interface Props {
+  groups: ResumeSkillGroup[];
+}
+
+const { groups } = Astro.props;
+---
+
+<div class="editorial-skill-grid">
+  {
+    groups.map((group) => (
+      <section class="editorial-skill-card">
+        <h3 class="editorial-skill-name">{group.name}</h3>
+        <ul class="editorial-skill-list">
+          {group.items.map((item) => <li class="editorial-skill-item">{item}</li>)}
+        </ul>
+      </section>
+    ))
+  }
+</div>

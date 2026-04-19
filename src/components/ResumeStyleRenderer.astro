@@ -1,0 +1,36 @@
+---
+import GlassResumeWebPage from './resume-styles/glass/GlassResumeWebPage.astro';
+import GlassResumePrintPage from './resume-styles/glass/GlassResumePrintPage.astro';
+import EditorialResumeWebPage from './resume-styles/editorial/EditorialResumeWebPage.astro';
+import EditorialResumePrintPage from './resume-styles/editorial/EditorialResumePrintPage.astro';
+import type { ResumeStyleId } from '../lib/resume-style-catalog';
+import { getResumeStyleDefinition } from '../lib/resume-style-catalog';
+
+interface Props {
+  styleId: ResumeStyleId;
+  variant: 'web' | 'print';
+  [key: string]: unknown;
+}
+
+const { styleId, variant, ...pageProps } = Astro.props;
+const style = getResumeStyleDefinition(styleId);
+
+if (!style) {
+  throw new Error(`未知简历样式: ${styleId}`);
+}
+
+const componentMap = {
+  glass: {
+    print: GlassResumePrintPage,
+    web: GlassResumeWebPage,
+  },
+  editorial: {
+    print: EditorialResumePrintPage,
+    web: EditorialResumeWebPage,
+  },
+} as const;
+
+const Component = componentMap[styleId][variant];
+---
+
+<Component {...pageProps} />

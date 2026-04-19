@@ -1,0 +1,19 @@
+---
+import ResumeStyleRenderer from '../components/ResumeStyleRenderer.astro';
+import { loadResumeContent } from '../lib/resume';
+import { getMasterResumeDefinition } from '../lib/resume-catalog';
+
+const definition = await getMasterResumeDefinition();
+const { hero, styleId, sections } = await loadResumeContent(definition.id);
+
+const pageTitle = `${hero.data.title} | ${definition.label} | 打印简历`;
+---
+
+<ResumeStyleRenderer
+  styleId={styleId}
+  variant="print"
+  hero={hero}
+  sections={sections}
+  kicker={definition.kicker}
+  pageTitle={pageTitle}
+/>

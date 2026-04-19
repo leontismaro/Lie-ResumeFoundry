@@ -1,0 +1,253 @@
+:root {
+  color-scheme: light;
+  font-family: "Avenir Next", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  --hub-bg: #e9f5fb;
+  --hub-panel: rgba(252, 255, 255, 0.82);
+  --hub-panel-strong: #fcfeff;
+  --hub-text: #16303d;
+  --hub-muted: #5b7583;
+  --hub-accent: #2f8fbe;
+  --hub-accent-strong: #1c6f98;
+  --hub-glow: rgba(113, 205, 241, 0.22);
+  --hub-border: rgba(31, 88, 116, 0.12);
+  --hub-border-strong: rgba(31, 88, 116, 0.2);
+  --hub-shadow: 0 24px 70px rgba(35, 92, 120, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--hub-text);
+  background:
+    radial-gradient(circle at top left, rgba(28, 111, 152, 0.1), transparent 28%),
+    radial-gradient(circle at 85% 10%, var(--hub-glow), transparent 24%),
+    var(--hub-bg);
+}
+
+a {
+  color: inherit;
+}
+
+.resume-hub {
+  position: relative;
+  width: min(1120px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 72px 0 80px;
+}
+
+.resume-hub-noise {
+  position: absolute;
+  inset: 0;
+  opacity: 0.18;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(29, 38, 31, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(29, 38, 31, 0.03) 1px, transparent 1px);
+  background-size: 22px 22px;
+  mask-image: radial-gradient(circle at center, black 40%, transparent 92%);
+}
+
+.resume-hub-hero {
+  position: relative;
+  margin-top: 18px;
+  margin-bottom: 20px;
+  padding: 34px 36px;
+  overflow: hidden;
+  border: 1px solid var(--hub-border);
+  border-radius: 26px;
+  background:
+    radial-gradient(circle at top right, rgba(47, 143, 190, 0.14), transparent 36%),
+    linear-gradient(140deg, rgba(255, 255, 255, 0.46), transparent 42%),
+    var(--hub-panel-strong);
+  box-shadow: var(--hub-shadow);
+  backdrop-filter: blur(18px);
+}
+
+.resume-hub-hero::before,
+.resume-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.7), transparent);
+}
+
+.resume-hub-kicker {
+  margin: 0 0 12px;
+  font-size: 0.76rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--hub-accent);
+}
+
+.resume-hub-title {
+  margin: 0;
+  max-width: none;
+  font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  font-size: clamp(2.7rem, 5.2vw, 4.9rem);
+  line-height: 0.92;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+
+.resume-hub-summary {
+  margin: 16px 0 0;
+  max-width: 720px;
+  font-size: 0.98rem;
+  line-height: 1.62;
+  color: var(--hub-muted);
+}
+
+.resume-hub-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.resume-card {
+  position: relative;
+  display: grid;
+  gap: 18px;
+  align-content: start;
+  padding: 24px;
+  min-height: 0;
+  border: 1px solid var(--hub-border);
+  border-radius: 24px;
+  background: var(--hub-panel);
+  box-shadow: var(--hub-shadow);
+  backdrop-filter: blur(18px);
+}
+
+.resume-card-header {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+
+.resume-card-kicker {
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--hub-accent);
+}
+
+.resume-card-title {
+  margin: 0;
+  font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  font-size: 1.7rem;
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+}
+
+.resume-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.resume-card-style-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 10px;
+  border: 1px solid rgba(47, 143, 190, 0.18);
+  border-radius: 999px;
+  background: rgba(47, 143, 190, 0.08);
+  font-size: 0.8rem;
+  line-height: 1;
+  color: var(--hub-accent-strong);
+}
+
+.resume-card-summary {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.62;
+  color: var(--hub-muted);
+}
+
+.resume-card-actions {
+  display: flex;
+  gap: 10px;
+  align-items: end;
+  flex-wrap: wrap;
+}
+
+.resume-card-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 128px;
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: 999px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease;
+}
+
+.resume-card-link:hover {
+  transform: translateY(-1px);
+}
+
+.resume-card-link-primary {
+  color: #f8fdff;
+  background: var(--hub-accent-strong);
+  box-shadow: 0 12px 24px rgba(28, 111, 152, 0.18);
+}
+
+.resume-card-link-secondary {
+  border: 1px solid var(--hub-border);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.resume-card-link-secondary:hover {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.resume-card:hover {
+  border-color: var(--hub-border-strong);
+  transform: translateY(-2px);
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+@media (max-width: 900px) {
+  .resume-hub-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .resume-hub {
+    width: min(100% - 28px, 1120px);
+    padding: 44px 0 52px;
+  }
+
+  .resume-hub-hero {
+    padding: 28px 22px;
+  }
+
+  .resume-card {
+    padding: 20px;
+  }
+
+  .resume-card-actions {
+    align-items: stretch;
+  }
+
+  .resume-card-link {
+    width: 100%;
+  }
+}

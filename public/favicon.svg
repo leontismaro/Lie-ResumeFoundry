@@ -1,9 +1,67 @@
-<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 128 128">
-    <path d="M50.4 78.5a75.1 75.1 0 0 0-28.5 6.9l24.2-65.7c.7-2 1.9-3.2 3.4-3.2h29c1.5 0 2.7 1.2 3.4 3.2l24.2 65.7s-11.6-7-28.5-7L67 45.5c-.4-1.7-1.6-2.8-2.9-2.8-1.3 0-2.5 1.1-2.9 2.7L50.4 78.5Zm-1.1 28.2Zm-4.2-20.2c-2 6.6-.6 15.8 4.2 20.2a17.5 17.5 0 0 1 .2-.7 5.5 5.5 0 0 1 5.7-4.5c2.8.1 4.3 1.5 4.7 4.7.2 1.1.2 2.3.2 3.5v.4c0 2.7.7 5.2 2.2 7.4a13 13 0 0 0 5.7 4.9v-.3l-.2-.3c-1.8-5.6-.5-9.5 4.4-12.8l1.5-1a73 73 0 0 0 3.2-2.2 16 16 0 0 0 6.8-11.4c.3-2 .1-4-.6-6l-.8.6-1.6 1a37 37 0 0 1-22.4 2.7c-5-.7-9.7-2-13.2-6.2Z" />
-    <style>
-        path { fill: #000; }
-        @media (prefers-color-scheme: dark) {
-            path { fill: #FFF; }
-        }
-    </style>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Resume icon">
+  <defs>
+    <linearGradient id="bg" x1="20" y1="10" x2="108" y2="118" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#effbff" />
+      <stop offset="0.24" stop-color="#8dd8f3" />
+      <stop offset="0.64" stop-color="#2f8fbe" />
+      <stop offset="1" stop-color="#14577b" />
+    </linearGradient>
+    <linearGradient id="glass" x1="28" y1="18" x2="104" y2="110" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.88" />
+      <stop offset="0.48" stop-color="#ffffff" stop-opacity="0.36" />
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0.08" />
+    </linearGradient>
+    <linearGradient id="sheet" x1="36" y1="24" x2="88" y2="98" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff" />
+      <stop offset="1" stop-color="#dff4fc" />
+    </linearGradient>
+    <linearGradient id="fold" x1="73" y1="24" x2="86" y2="40" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f7fdff" />
+      <stop offset="1" stop-color="#b5e6f8" />
+    </linearGradient>
+    <linearGradient id="line" x1="40" y1="0" x2="87" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1d6b93" />
+      <stop offset="1" stop-color="#56b7df" />
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#0f4867" flood-opacity="0.22" />
+    </filter>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" />
+    </filter>
+  </defs>
+
+  <rect x="6" y="6" width="116" height="116" rx="30" fill="url(#bg)" />
+  <circle cx="98" cy="24" r="26" fill="#ffffff" fill-opacity="0.34" filter="url(#glow)" />
+  <path
+    d="M24 18c21-8 59-8 80 8v30c-13-8-31-13-52-13-11 0-21 1-30 4V18Z"
+    fill="url(#glass)"
+  />
+  <rect x="14" y="14" width="100" height="100" rx="24" fill="none" stroke="#ffffff" stroke-opacity="0.34" />
+
+  <g filter="url(#shadow)">
+    <path
+      d="M34 24h42l14 14v49c0 7-5 12-12 12H46c-7 0-12-5-12-12V24Z"
+      fill="url(#sheet)"
+    />
+    <path d="M76 24v11c0 2 2 4 4 4h10L76 24Z" fill="url(#fold)" />
+    <path d="M78 24l12 12h-8c-2 0-4-2-4-4v-8Z" fill="#9ad8f0" fill-opacity="0.9" />
+  </g>
+
+  <circle cx="47" cy="45" r="6" fill="#2c85b3" fill-opacity="0.16" />
+  <circle cx="47" cy="45" r="4.5" fill="#2f8fbe" />
+  <rect x="57" y="41" width="23" height="5" rx="2.5" fill="url(#line)" />
+  <rect x="40" y="57" width="40" height="5" rx="2.5" fill="url(#line)" />
+  <rect x="40" y="68" width="31" height="5" rx="2.5" fill="#5ebde3" />
+  <rect x="40" y="79" width="25" height="5" rx="2.5" fill="#8bd8f3" />
+
+  <g transform="translate(74 74)">
+    <circle cx="16" cy="16" r="18" fill="#165d80" fill-opacity="0.96" />
+    <circle cx="16" cy="16" r="17" fill="none" stroke="#93ddf4" stroke-opacity="0.65" />
+    <path
+      d="M16 6.5l2.9 6.7 6.6 2.8-6.6 2.8-2.9 6.7-2.9-6.7-6.6-2.8 6.6-2.8L16 6.5Z"
+      fill="#f5fdff"
+    />
+    <circle cx="16" cy="16" r="2.1" fill="#4fb5dd" />
+  </g>
 </svg>

@@ -1,0 +1,92 @@
+---
+import PrintSection from '../../PrintSection.astro';
+import PrintSkillsSection from '../../PrintSkillsSection.astro';
+import ProfileMetaGrid from '../../ProfileMetaGrid.astro';
+import { parseResumeSkillGroups } from '../../../lib/resume-skill-groups';
+import '../../../styles/resume-themes/editorial-print.css';
+
+interface SectionEntry {
+  body?: string;
+  data: {
+    title: string;
+    summary?: string;
+    sectionSlug: string;
+  };
+  Content: any;
+}
+
+interface Props {
+  hero: {
+    data: {
+      title: string;
+      subtitle?: string;
+      summary?: string;
+      contacts?: Array<{
+        label?: string;
+        value?: string;
+        href?: string;
+      }>;
+    };
+  };
+  sections: SectionEntry[];
+  kicker: string;
+  pageTitle: string;
+}
+
+const { hero, sections, kicker, pageTitle } = Astro.props;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{pageTitle}</title>
+  </head>
+  <body class="editorial-print-body">
+    <main class="editorial-print-page">
+      <section class="editorial-print-sheet">
+        <header class="editorial-print-hero">
+          <p class="editorial-print-kicker">{kicker}</p>
+          <h1 class="editorial-print-title">{hero.data.title}</h1>
+          {hero.data.subtitle && <p class="editorial-print-role">{hero.data.subtitle}</p>}
+          {hero.data.summary && <p class="editorial-print-summary">{hero.data.summary}</p>}
+
+          <div class="editorial-print-meta">
+            <ProfileMetaGrid
+              contacts={hero.data.contacts}
+              variant="print"
+            />
+          </div>
+        </header>
+
+        <section class="editorial-print-flow">
+          {
+            sections.map((section) => {
+              if (section.data.sectionSlug === 'skills') {
+                return (
+                  <PrintSkillsSection
+                    title={section.data.title}
+                    summary={section.data.summary}
+                    groups={parseResumeSkillGroups(section.body)}
+                  />
+                );
+              }
+
+              return (
+                <PrintSection
+                  title={section.data.title}
+                  summary={section.data.summary}
+                  slug={section.data.sectionSlug}
+                >
+                  <section.Content />
+                </PrintSection>
+              );
+            })
+          }
+        </section>
+      </section>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,37 @@
+---
+interface NavItem {
+  href: string;
+  label: string;
+}
+
+interface Props {
+  name: string;
+  subtitle?: string;
+  items: NavItem[];
+  printHref: string;
+}
+
+const { name, subtitle, items, printHref } = Astro.props;
+---
+
+<header class="site-nav-shell">
+  <div class="site-nav">
+    <a class="site-nav-brand" href="#top" aria-label="返回顶部">
+      <span class="site-nav-name">{name}</span>
+      {subtitle && <span class="site-nav-role">{subtitle}</span>}
+    </a>
+
+    <nav class="site-nav-links" aria-label="页面导航">
+      {
+        items.map((item) => (
+          <a href={item.href} class="site-nav-link">
+            {item.label}
+          </a>
+        ))
+      }
+      <a href={printHref} class="site-nav-link site-nav-link-print" target="_blank" rel="noreferrer">
+        打印版
+      </a>
+    </nav>
+  </div>
+</header>

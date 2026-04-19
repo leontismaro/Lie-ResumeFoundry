@@ -1,0 +1,238 @@
+@page {
+  size: A4;
+  margin: 9mm 10mm 11mm;
+}
+
+:root {
+  --editorial-paper: #fffdf8;
+  --editorial-ink: #231d18;
+  --editorial-muted: #6f655b;
+  --editorial-line: rgba(35, 29, 24, 0.16);
+  --editorial-accent: #8b4b2c;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.editorial-print-page {
+  padding: 12px 0 28px;
+}
+
+.editorial-print-sheet {
+  width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto;
+  padding: 10mm 10mm 11mm;
+  background: var(--editorial-paper);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+}
+
+.editorial-print-hero {
+  padding-bottom: 4.5mm;
+  border-bottom: 1px solid var(--editorial-line);
+}
+
+.editorial-print-kicker {
+  margin: 0 0 2mm;
+  color: var(--editorial-accent);
+  font-family: "Avenir Next", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 10pt;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.editorial-print-title {
+  margin: 0;
+  font-size: 31pt;
+  line-height: 0.98;
+}
+
+.editorial-print-role {
+  margin: 2mm 0 0;
+  color: var(--editorial-accent);
+  font-family: "Avenir Next", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 13pt;
+  font-weight: 700;
+}
+
+.editorial-print-summary {
+  margin: 3mm 0 0;
+  color: var(--editorial-muted);
+  font-size: 11pt;
+}
+
+.editorial-print-meta {
+  margin-top: 4mm;
+}
+
+.editorial-print-flow {
+  margin-top: 5mm;
+}
+
+@media screen and (max-width: 900px) {
+  .editorial-print-page {
+    padding: 0;
+  }
+
+  .editorial-print-sheet {
+    width: 100%;
+    min-height: auto;
+    padding: 20px 16px 32px;
+  }
+}
+
+body.editorial-print-body {
+  margin: 0;
+  min-height: 100vh;
+  background: #efe8de;
+  color: var(--editorial-ink);
+  font-family: "Source Han Serif SC", "Songti SC", "Noto Serif SC", "STSong", serif;
+  line-height: 1.42;
+}
+
+body.editorial-print-body .profile-meta-grid-print {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2.2mm 4mm;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+body.editorial-print-body .profile-meta-grid-print .profile-meta-item {
+  display: grid;
+  grid-template-columns: 18mm 1fr;
+  gap: 2mm;
+  align-items: baseline;
+  min-width: 0;
+}
+
+body.editorial-print-body .profile-meta-grid-print .profile-meta-label {
+  color: var(--editorial-muted);
+  font-family: "Avenir Next", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 8.8pt;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+body.editorial-print-body .profile-meta-grid-print .profile-meta-value {
+  color: var(--editorial-ink);
+  text-decoration: none;
+  white-space: normal;
+  min-width: 0;
+}
+
+body.editorial-print-body .profile-meta-grid-print .profile-meta-value[href] {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+body.editorial-print-body .editorial-print-flow .print-section + .print-section {
+  margin-top: 4.5mm;
+}
+
+body.editorial-print-body .print-section {
+  break-inside: avoid;
+}
+
+body.editorial-print-body .print-section-header {
+  padding-bottom: 1.6mm;
+  border-bottom: 1px solid var(--editorial-line);
+}
+
+body.editorial-print-body .print-section-title {
+  margin: 0;
+  font-size: 14pt;
+  line-height: 1.08;
+}
+
+body.editorial-print-body .print-section-summary,
+body.editorial-print-body .print-section-body blockquote,
+body.editorial-print-body .print-skill-items {
+  color: var(--editorial-muted);
+}
+
+body.editorial-print-body .print-section-summary {
+  margin: 1.2mm 0 0;
+  font-size: 10pt;
+}
+
+body.editorial-print-body .print-section-body {
+  font-size: 10.8pt;
+}
+
+body.editorial-print-body .print-section-body > :first-child {
+  margin-top: 2mm;
+}
+
+body.editorial-print-body .print-section-body > :last-child {
+  margin-bottom: 0;
+}
+
+body.editorial-print-body .print-section-body h3 {
+  margin: 2.4mm 0 1mm;
+  font-size: 11.45pt;
+  line-height: 1.28;
+}
+
+body.editorial-print-body .print-section-body p,
+body.editorial-print-body .print-section-body ul,
+body.editorial-print-body .print-section-body ol,
+body.editorial-print-body .print-section-body pre,
+body.editorial-print-body .print-section-body blockquote {
+  margin: 1.2mm 0;
+}
+
+body.editorial-print-body .print-section-body ul,
+body.editorial-print-body .print-section-body ol {
+  padding-left: 3.8mm;
+}
+
+body.editorial-print-body .print-section-body li + li {
+  margin-top: 0.6mm;
+}
+
+body.editorial-print-body .print-section-body a {
+  color: inherit;
+  text-decoration: none;
+}
+
+body.editorial-print-body .print-section-body pre {
+  padding: 1.8mm;
+  border: 1px solid var(--editorial-line);
+  white-space: pre-wrap;
+}
+
+body.editorial-print-body .print-section-body blockquote {
+  padding-left: 2.2mm;
+  border-left: 0.8mm solid rgba(139, 75, 44, 0.24);
+}
+
+body.editorial-print-body .print-skill-grid {
+  display: grid;
+  grid-template-columns: 32mm 1fr;
+  column-gap: 3.5mm;
+  row-gap: 1.2mm;
+  align-items: start;
+}
+
+body.editorial-print-body .print-skill-name {
+  margin: 0;
+  font-size: 10.7pt;
+  line-height: 1.34;
+  color: var(--editorial-ink);
+}
+
+body.editorial-print-body .print-skill-items {
+  margin: 0;
+  font-size: 10.6pt;
+  line-height: 1.45;
+}
+
+@media screen and (max-width: 900px) {
+  body.editorial-print-body .profile-meta-grid-print {
+    grid-template-columns: 1fr;
+  }
+}

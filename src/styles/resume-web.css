@@ -1,0 +1,518 @@
+:root {
+  --canvas: #e9f5fb;
+  --surface: rgba(252, 255, 255, 0.82);
+  --surface-strong: #fcfeff;
+  --line: rgba(31, 88, 116, 0.12);
+  --line-strong: rgba(31, 88, 116, 0.2);
+  --ink: #16303d;
+  --muted: #5b7583;
+  --accent: #2f8fbe;
+  --accent-strong: #1c6f98;
+  --accent-soft: rgba(47, 143, 190, 0.12);
+  --glow: rgba(113, 205, 241, 0.22);
+  --shadow: 0 24px 70px rgba(35, 92, 120, 0.12);
+  --radius-xl: 30px;
+  --radius-lg: 22px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+.site-nav-shell {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  padding: 18px 20px 0;
+}
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  width: min(1180px, 100%);
+  margin: 0 auto;
+  padding: 14px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 999px;
+  background: rgba(245, 252, 255, 0.74);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 16px 34px rgba(35, 92, 120, 0.08);
+}
+
+.site-nav-brand {
+  display: inline-flex;
+  flex-direction: column;
+  color: inherit;
+  text-decoration: none;
+}
+
+.site-nav-name {
+  font-size: 0.96rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.site-nav-role {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.site-nav-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.site-nav-link {
+  padding: 0.48rem 0.88rem;
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 0.92rem;
+  text-decoration: none;
+  transition:
+    background-color 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+.site-nav-link:hover {
+  background: rgba(255, 255, 255, 0.66);
+  color: var(--ink);
+  transform: translateY(-1px);
+}
+
+.site-nav-link-print {
+  border: 1px solid var(--line);
+  color: var(--accent-strong);
+}
+
+.resume-page {
+  position: relative;
+  width: min(1180px, 100%);
+  margin: 0 auto;
+  padding: 28px 20px 72px;
+}
+
+.resume-page-noise {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.26), transparent 20%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent 35%);
+  pointer-events: none;
+}
+
+.resume-hero,
+.resume-section {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+}
+
+.resume-hero::before,
+.resume-section::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.7), transparent);
+}
+
+.resume-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+  gap: 28px;
+  margin-top: 18px;
+  padding: 42px;
+  background:
+    radial-gradient(circle at top right, rgba(47, 143, 190, 0.14), transparent 36%),
+    linear-gradient(140deg, rgba(255, 255, 255, 0.46), transparent 42%),
+    var(--surface-strong);
+}
+
+.resume-hero-copy,
+.resume-hero-panel,
+.resume-section {
+  animation: fade-up 560ms ease both;
+}
+
+.resume-hero-kicker,
+.resume-section-kicker {
+  margin: 0 0 0.75rem;
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.resume-hero-title {
+  margin: 0;
+  font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  font-size: clamp(3rem, 5vw, 5.2rem);
+  line-height: 0.94;
+  letter-spacing: -0.05em;
+}
+
+.resume-hero-role {
+  margin: 0.9rem 0 0;
+  color: var(--accent-strong);
+  font-size: 1.12rem;
+  font-weight: 650;
+}
+
+.resume-hero-summary {
+  margin: 1.15rem 0 0;
+  max-width: 34rem;
+  color: var(--muted);
+  font-size: 1rem;
+}
+
+.resume-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 1.8rem;
+}
+
+.resume-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 0 1rem;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease;
+}
+
+.resume-button:hover {
+  transform: translateY(-1px);
+}
+
+.resume-button-primary {
+  background: var(--accent-strong);
+  color: #f8fdff;
+  box-shadow: 0 12px 24px rgba(28, 111, 152, 0.18);
+}
+
+.resume-button-secondary {
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--ink);
+}
+
+.resume-hero-panel {
+  padding: 22px 22px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.74);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.58);
+}
+
+.resume-hero-panel > :first-child,
+.resume-section-body > :first-child {
+  margin-top: 0;
+}
+
+.resume-hero-panel > :last-child,
+.resume-section-body > :last-child {
+  margin-bottom: 0;
+}
+
+.resume-hero-panel p {
+  margin: 0.8rem 0 0;
+  color: var(--muted);
+}
+
+.resume-layout {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.72fr) minmax(0, 1.28fr);
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.resume-sidebar {
+  display: grid;
+  align-content: start;
+  gap: 24px;
+}
+
+.resume-main {
+  display: grid;
+  gap: 24px;
+}
+
+.resume-section {
+  padding: 30px 28px 26px;
+}
+
+.resume-section-tone-primary {
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.4), transparent 28%),
+    var(--surface);
+}
+
+.resume-section-header {
+  margin-bottom: 18px;
+}
+
+.resume-section-title {
+  margin: 0;
+  font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  font-size: clamp(1.4rem, 2.2vw, 2.2rem);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+}
+
+.resume-section-subtitle {
+  margin: 0.55rem 0 0;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.resume-section-summary {
+  margin: 0.72rem 0 0;
+  color: var(--muted);
+}
+
+.resume-section-body h3 {
+  position: relative;
+  margin: 1.8rem 0 0.55rem;
+  padding-left: 1rem;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.resume-section-body h3::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.42rem;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: var(--accent);
+  box-shadow: 0 0 0 6px rgba(47, 143, 190, 0.1);
+}
+
+.resume-section-body p,
+.resume-section-body ul,
+.resume-section-body ol,
+.resume-section-body pre,
+.resume-section-body blockquote {
+  margin: 0.78rem 0;
+}
+
+.resume-section-body ul,
+.resume-section-body ol {
+  padding-left: 1.2rem;
+}
+
+.resume-section-body li + li {
+  margin-top: 0.42rem;
+}
+
+.resume-section-body strong {
+  color: var(--ink);
+}
+
+.resume-section-body a {
+  color: var(--accent-strong);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(28, 111, 152, 0.2);
+}
+
+.resume-section-body a:hover {
+  border-bottom-color: currentColor;
+}
+
+.resume-section-body code {
+  padding: 0.14rem 0.45rem;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  font-size: 0.92em;
+}
+
+.resume-section-body pre {
+  overflow-x: auto;
+  padding: 0.9rem 1rem;
+  border: 1px solid rgba(47, 143, 190, 0.14);
+  border-radius: 16px;
+  background: #f1f9fd;
+}
+
+.resume-section-body pre code {
+  padding: 0;
+  background: transparent;
+}
+
+.resume-section-body blockquote {
+  padding-left: 1rem;
+  border-left: 3px solid rgba(47, 143, 190, 0.24);
+  color: var(--muted);
+}
+
+.resume-section-skills .resume-section-body ul {
+  columns: 2;
+  column-gap: 1.35rem;
+}
+
+.resume-section-skills .resume-section-body li {
+  break-inside: avoid;
+}
+
+.resume-section-education .resume-section-body h3,
+.resume-section-skills .resume-section-body h3 {
+  margin-top: 1.3rem;
+}
+
+.resume-section-experience .resume-section-body,
+.resume-section-projects .resume-section-body {
+  position: relative;
+}
+
+.resume-section-experience .resume-section-body::before,
+.resume-section-projects .resume-section-body::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0.21rem;
+  width: 1px;
+  background: linear-gradient(180deg, rgba(47, 143, 190, 0.2), transparent 96%);
+}
+
+.resume-section-experience .resume-section-body > *:not(h3),
+.resume-section-projects .resume-section-body > *:not(h3) {
+  margin-left: 1rem;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 960px) {
+  .site-nav-shell {
+    padding-inline: 14px;
+  }
+
+  .site-nav {
+    border-radius: 24px;
+  }
+
+  .resume-page {
+    padding-inline: 14px;
+  }
+
+  .resume-hero {
+    grid-template-columns: 1fr;
+    padding: 28px 22px;
+  }
+
+  .resume-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .resume-section-skills .resume-section-body ul {
+    grid-template-columns: 1fr;
+    columns: 1;
+  }
+}
+
+@media (max-width: 700px) {
+  .site-nav {
+    align-items: flex-start;
+    border-radius: 22px;
+  }
+
+  .site-nav-links {
+    justify-content: flex-start;
+  }
+
+  .resume-hero-title {
+    font-size: clamp(2.5rem, 15vw, 4rem);
+  }
+
+  .resume-section {
+    padding-inline: 20px;
+  }
+
+  .resume-section-experience .resume-section-body > *:not(h3),
+  .resume-section-projects .resume-section-body > *:not(h3) {
+    margin-left: 0.88rem;
+  }
+}
+
+body.glass-web-body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(28, 111, 152, 0.1), transparent 28%),
+    radial-gradient(circle at 85% 10%, var(--glow), transparent 24%),
+    var(--canvas);
+  color: var(--ink);
+  font-family: "Avenir Next", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  line-height: 1.72;
+}
+
+body.glass-web-body .profile-meta-grid-web {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: 10px 12px;
+  margin: 0 0 1.2rem;
+  padding: 0;
+  list-style: none;
+}
+
+body.glass-web-body .profile-meta-grid-web .profile-meta-item {
+  display: grid;
+  grid-template-columns: minmax(0, 72px) minmax(0, 1fr);
+  gap: 8px;
+  align-items: baseline;
+  min-width: 0;
+}
+
+body.glass-web-body .profile-meta-grid-web .profile-meta-label {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+body.glass-web-body .profile-meta-grid-web .profile-meta-value {
+  min-width: 0;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+  text-decoration: none;
+}
+
+@media (max-width: 960px) {
+  body.glass-web-body .profile-meta-grid-web {
+    grid-template-columns: 1fr;
+  }
+}

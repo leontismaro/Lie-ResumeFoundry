@@ -1,0 +1,141 @@
+---
+import EditorialSkillsSection from './EditorialSkillsSection.astro';
+import ProfileMetaGrid from '../../ProfileMetaGrid.astro';
+import { parseResumeSkillGroups } from '../../../lib/resume-skill-groups';
+import '../../../styles/resume-themes/editorial-web.css';
+
+interface ResumeEntry {
+  data: {
+    title: string;
+    subtitle?: string;
+    summary?: string;
+    sectionSlug: string;
+  };
+  Content: any;
+}
+
+interface Props {
+  hero: {
+    data: {
+      title: string;
+      subtitle?: string;
+      summary?: string;
+      contacts?: Array<{
+        label?: string;
+        value?: string;
+        href?: string;
+      }>;
+    };
+    Content: any;
+  };
+  navItems: Array<{
+    href: string;
+    label: string;
+  }>;
+  sections: ResumeEntry[];
+  primarySection?: ResumeEntry | null;
+  kicker: string;
+  printHref: string;
+}
+
+const { hero, navItems, sections, primarySection, kicker, printHref } = Astro.props;
+const pageDescription = hero.data.summary ?? '简历内容';
+const primaryActionHref = primarySection ? `#${primarySection.data.sectionSlug}` : '#top';
+const primaryActionLabel = primarySection ? primarySection.data.title : '简历内容';
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={pageDescription} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <title>{hero.data.title} | 简历</title>
+  </head>
+  <body class="editorial-page-body">
+    <main class="editorial-page" id="top">
+      <header class="editorial-hero">
+        <div class="editorial-hero-main">
+          <p class="editorial-hero-kicker">{kicker} / Resume</p>
+          <h1 class="editorial-hero-title">{hero.data.title}</h1>
+          {hero.data.subtitle && <p class="editorial-hero-role">{hero.data.subtitle}</p>}
+          {hero.data.summary && <p class="editorial-hero-summary">{hero.data.summary}</p>}
+
+          <div class="editorial-hero-actions">
+            <a class="editorial-hero-link editorial-hero-link-primary" href={primaryActionHref}>
+              {primaryActionLabel}
+            </a>
+            <a class="editorial-hero-link editorial-hero-link-secondary" href={printHref} target="_blank" rel="noreferrer">
+              打印版 / PDF
+            </a>
+          </div>
+        </div>
+
+        <div class="editorial-hero-side">
+          <ProfileMetaGrid
+            contacts={hero.data.contacts}
+            variant="web"
+          />
+          <div class="editorial-hero-prologue">
+            <hero.Content />
+          </div>
+        </div>
+      </header>
+
+      <section class="editorial-layout">
+        <aside class="editorial-rail">
+          <div class="editorial-rail-block">
+            <div class="editorial-rail-avatar-shell">
+              <img
+                class="editorial-rail-avatar"
+                src="/avatar.jpg"
+                alt="个人头像"
+                width="160"
+                height="160"
+                decoding="async"
+              />
+            </div>
+            <p class="editorial-rail-label">Section Index</p>
+            <nav class="editorial-rail-nav" aria-label="页面导航">
+              {
+                navItems.map((item) => (
+                  <a class="editorial-rail-link" href={item.href}>
+                    {item.label}
+                  </a>
+                ))
+              }
+            </nav>
+          </div>
+        </aside>
+
+        <div class="editorial-content">
+          {
+            sections.map((section) => (
+              <article id={section.data.sectionSlug} class={`editorial-section editorial-section-${section.data.sectionSlug}`}>
+                <header class="editorial-section-header">
+                  <p class="editorial-section-kicker">{section.data.sectionSlug}</p>
+                  <h2 class="editorial-section-title">{section.data.title}</h2>
+                  {section.data.subtitle && <p class="editorial-section-subtitle">{section.data.subtitle}</p>}
+                  {section.data.summary && <p class="editorial-section-summary">{section.data.summary}</p>}
+                </header>
+
+                <div class="editorial-section-body">
+                  {
+                    section.data.sectionSlug === 'skills' ? (
+                      <EditorialSkillsSection groups={parseResumeSkillGroups(section.body)} />
+                    ) : (
+                      <section.Content />
+                    )
+                  }
+                </div>
+              </article>
+            ))
+          }
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

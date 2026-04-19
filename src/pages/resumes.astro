@@ -1,0 +1,67 @@
+---
+import { getListedResumeCatalog, getResumePath } from '../lib/resume-catalog';
+import '../styles/resume-hub.css';
+
+const resumes = await getListedResumeCatalog();
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content="查看当前站点提供的全部简历版本。" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <title>简历列表</title>
+  </head>
+  <body>
+    <main class="resume-hub">
+      <div class="resume-hub-noise" aria-hidden="true"></div>
+
+      <section class="resume-hub-hero">
+        <p class="resume-hub-kicker">Resume Directory</p>
+        <h1 class="resume-hub-title">选择合适的简历版本</h1>
+        <p class="resume-hub-summary">
+          这里提供不同方向的简历版本，分别突出平台工程、全栈产品交付等能力重点，便于快速查看与岗位更匹配的内容。
+        </p>
+      </section>
+
+      <section class="resume-hub-grid" aria-label="简历列表">
+        {
+          resumes.map((resume) => (
+            <article class="resume-card">
+              <div class="resume-card-header">
+                <p class="resume-card-kicker">{resume.kicker}</p>
+                <h2 class="resume-card-title">{resume.label}</h2>
+                <p class="resume-card-summary">{resume.summary}</p>
+              </div>
+
+              <div class="resume-card-actions">
+                <a
+                  class="resume-card-link resume-card-link-primary"
+                  href={getResumePath(resume.id, { preferMasterRoot: true, isMaster: resume.isMaster })}
+                >
+                  查看网页版
+                </a>
+                <a
+                  class="resume-card-link resume-card-link-secondary"
+                  href={getResumePath(resume.id, {
+                    preferMasterRoot: true,
+                    print: true,
+                    isMaster: resume.isMaster,
+                  })}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  打印版 / PDF
+                </a>
+              </div>
+            </article>
+          ))
+        }
+      </section>
+    </main>
+  </body>
+</html>

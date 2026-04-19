@@ -1,0 +1,42 @@
+---
+interface Props {
+  id: string;
+  title: string;
+  subtitle?: string;
+  summary?: string;
+  slug: string;
+  layout?: 'full' | 'compact';
+  tone?: 'primary' | 'secondary';
+}
+
+const {
+  id,
+  title,
+  subtitle,
+  summary,
+  slug,
+  layout = 'compact',
+  tone = 'secondary',
+} = Astro.props;
+---
+
+<section
+  id={id}
+  class:list={[
+    'resume-section',
+    `resume-section-${slug}`,
+    `resume-section-layout-${layout}`,
+    `resume-section-tone-${tone}`,
+  ]}
+>
+  <header class="resume-section-header">
+    <p class="resume-section-kicker">{tone === 'primary' ? 'Highlights' : 'Details'}</p>
+    <h2 class="resume-section-title">{title}</h2>
+    {subtitle && <p class="resume-section-subtitle">{subtitle}</p>}
+    {summary && <p class="resume-section-summary">{summary}</p>}
+  </header>
+
+  <div class="resume-section-body">
+    <slot />
+  </div>
+</section>

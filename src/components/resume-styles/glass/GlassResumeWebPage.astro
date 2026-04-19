@@ -1,0 +1,137 @@
+---
+import ResumeNav from '../../ResumeNav.astro';
+import ResumeSection from '../../ResumeSection.astro';
+import ProfileMetaGrid from '../../ProfileMetaGrid.astro';
+import '../../../styles/resume-themes/glass-web.css';
+
+interface ResumeEntry {
+  data: {
+    title: string;
+    subtitle?: string;
+    summary?: string;
+    sectionSlug: string;
+    layout: 'full' | 'compact';
+  };
+  Content: any;
+}
+
+interface Props {
+  hero: {
+    data: {
+      title: string;
+      subtitle?: string;
+      summary?: string;
+      contacts?: Array<{
+        label?: string;
+        value?: string;
+        href?: string;
+      }>;
+    };
+    Content: any;
+  };
+  navItems: Array<{
+    href: string;
+    label: string;
+  }>;
+  sections: ResumeEntry[];
+  primarySection?: ResumeEntry | null;
+  kicker: string;
+  printHref: string;
+}
+
+const { hero, navItems, sections, primarySection, kicker, printHref } = Astro.props;
+const pageDescription = hero.data.summary ?? '简历内容';
+const mainSections = sections.filter((section) => section.data.layout === 'full');
+const sideSections = sections.filter((section) => section.data.layout !== 'full');
+const primaryActionHref = primarySection ? `#${primarySection.data.sectionSlug}` : '#top';
+const primaryActionLabel = primarySection ? `查看${primarySection.data.title}` : '查看简历';
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={pageDescription} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <title>{hero.data.title} | 简历</title>
+  </head>
+  <body class="glass-web-body">
+    <ResumeNav
+      name={hero.data.title}
+      subtitle={hero.data.subtitle}
+      items={navItems}
+      printHref={printHref}
+    />
+
+    <main class="resume-page" id="top">
+      <div class="resume-page-noise" aria-hidden="true"></div>
+
+      <section class="resume-hero">
+        <div class="resume-hero-copy">
+          <p class="resume-hero-kicker">{kicker} / Resume</p>
+          <h1 class="resume-hero-title">{hero.data.title}</h1>
+          {hero.data.subtitle && <p class="resume-hero-role">{hero.data.subtitle}</p>}
+          {hero.data.summary && <p class="resume-hero-summary">{hero.data.summary}</p>}
+
+          <div class="resume-hero-actions">
+            <a class="resume-button resume-button-primary" href={primaryActionHref}>
+              {primaryActionLabel}
+            </a>
+            <a class="resume-button resume-button-secondary" href={printHref} target="_blank" rel="noreferrer">
+              打印版 / PDF
+            </a>
+          </div>
+        </div>
+
+        <div class="resume-hero-panel">
+          <ProfileMetaGrid
+            contacts={hero.data.contacts}
+            variant="web"
+          />
+          <hero.Content />
+        </div>
+      </section>
+
+      <section class="resume-layout">
+        <aside class="resume-sidebar">
+          {
+            sideSections.map((section) => (
+              <ResumeSection
+                id={section.data.sectionSlug}
+                title={section.data.title}
+                subtitle={section.data.subtitle}
+                summary={section.data.summary}
+                slug={section.data.sectionSlug}
+                layout={section.data.layout}
+                tone="secondary"
+              >
+                <section.Content />
+              </ResumeSection>
+            ))
+          }
+        </aside>
+
+        <div class="resume-main">
+          {
+            mainSections.map((section) => (
+              <ResumeSection
+                id={section.data.sectionSlug}
+                title={section.data.title}
+                subtitle={section.data.subtitle}
+                summary={section.data.summary}
+                slug={section.data.sectionSlug}
+                layout={section.data.layout}
+                tone="primary"
+              >
+                <section.Content />
+              </ResumeSection>
+            ))
+          }
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

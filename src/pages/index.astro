@@ -1,17 +1,25 @@
 ---
+import ResumeStyleRenderer from '../components/ResumeStyleRenderer.astro';
+import { loadResumeContent } from '../lib/resume';
+import { getMasterResumeDefinition, getResumePath } from '../lib/resume-catalog';
 
+const definition = await getMasterResumeDefinition();
+const { hero, styleId, navItems, sections, primarySection } = await loadResumeContent(definition.id);
+
+const printHref = getResumePath(definition.id, {
+  print: true,
+  preferMasterRoot: true,
+  isMaster: definition.isMaster,
+});
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<ResumeStyleRenderer
+  styleId={styleId}
+  variant="web"
+  hero={hero}
+  navItems={navItems}
+  sections={sections}
+  primarySection={primarySection}
+  kicker={definition.kicker}
+  printHref={printHref}
+/>

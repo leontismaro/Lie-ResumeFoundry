@@ -1,0 +1,39 @@
+---
+interface Props {
+  contacts?: Array<{
+    label?: string;
+    value?: string;
+    href?: string;
+  }>;
+  variant?: 'web' | 'print';
+}
+
+const { contacts = [], variant = 'web' } = Astro.props;
+
+const items = contacts
+  .filter((item) => item.label && item.value)
+  .map((item) => ({
+    label: item.label as string,
+    value: item.value as string,
+    href: item.href,
+  }));
+---
+
+<ul class:list={['profile-meta-grid', `profile-meta-grid-${variant}`]}>
+  {
+    items.map((item) => (
+      <li class="profile-meta-item">
+        <span class="profile-meta-label">{item.label}</span>
+        {
+          item.href ? (
+            <a class="profile-meta-value" href={item.href}>
+              {item.value}
+            </a>
+          ) : (
+            <span class="profile-meta-value">{item.value}</span>
+          )
+        }
+      </li>
+    ))
+  }
+</ul>

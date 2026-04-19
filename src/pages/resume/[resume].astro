@@ -1,0 +1,34 @@
+---
+import ResumeStyleRenderer from '../../components/ResumeStyleRenderer.astro';
+import { loadResumeContent } from '../../lib/resume';
+import { getResumeCatalog, getResumeDefinition, getResumePath } from '../../lib/resume-catalog';
+
+export async function getStaticPaths() {
+  return (await getResumeCatalog()).map((resume) => ({
+    params: {
+      resume: resume.id,
+    },
+  }));
+}
+
+const definition = await getResumeDefinition(Astro.params.resume);
+
+if (!definition) {
+  throw new Error(`未知简历: ${Astro.params.resume}`);
+}
+
+const { hero, styleId, navItems, sections, primarySection } = await loadResumeContent(definition.id);
+
+const printHref = getResumePath(definition.id, { print: true, isMaster: definition.isMaster });
+---
+
+<ResumeStyleRenderer
+  styleId={styleId}
+  variant="web"
+  hero={hero}
+  navItems={navItems}
+  sections={sections}
+  primarySection={primarySection}
+  kicker={definition.kicker}
+  printHref={printHref}
+/>

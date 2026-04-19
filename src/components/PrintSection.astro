@@ -1,0 +1,20 @@
+---
+interface Props {
+  title: string;
+  summary?: string;
+  slug: string;
+}
+
+const { title, summary, slug } = Astro.props;
+---
+
+<section class:list={['print-section', `print-section-${slug}`]}>
+  <header class="print-section-header">
+    <h2 class="print-section-title">{title}</h2>
+    {summary && <p class="print-section-summary">{summary}</p>}
+  </header>
+
+  <div class="print-section-body">
+    <slot />
+  </div>
+</section>
