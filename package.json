@@ -1,5 +1,5 @@
 {
-  "name": "afraid-azimuth",
+  "name": "lies-resumefoundry",
   "type": "module",
   "version": "0.0.1",
   "engines": {
@@ -9,9 +9,16 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "issue-qr": "node scripts/issue-qr.mjs",
+    "create-resume": "node scripts/create-resume.mjs"
   },
   "dependencies": {
     "astro": "^6.1.8"
+  },
+  "devDependencies": {
+    "qrcode": "^1.5.4",
+    "typescript": "^5.9.3",
+    "wrangler": "^4.14.1"
   }
 }
