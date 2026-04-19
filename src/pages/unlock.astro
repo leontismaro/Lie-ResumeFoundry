@@ -1,0 +1,255 @@
+---
+const pageTitle = '验证访问权限';
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="robots" content="noindex,nofollow,noarchive" />
+    <title>{pageTitle}</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #edf7ff;
+        --panel: rgba(255, 255, 255, 0.88);
+        --border: rgba(57, 125, 179, 0.16);
+        --ink: #173247;
+        --muted: #53728a;
+        --accent: #2b8fdc;
+        --accent-strong: #0f6eaf;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        background:
+          radial-gradient(circle at top, rgba(54, 152, 219, 0.18), transparent 42%),
+          linear-gradient(180deg, #f6fbff 0%, var(--bg) 100%);
+        color: var(--ink);
+        font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      }
+
+      main {
+        width: min(560px, 100%);
+        border: 1px solid var(--border);
+        border-radius: 28px;
+        background: var(--panel);
+        padding: 32px;
+        box-shadow: 0 28px 70px rgba(40, 94, 135, 0.12);
+        backdrop-filter: blur(16px);
+      }
+
+      h1 {
+        margin: 0 0 12px;
+        font-size: clamp(2rem, 4vw, 2.6rem);
+        line-height: 1.05;
+      }
+
+      p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      .stack {
+        display: grid;
+        gap: 18px;
+        margin-top: 24px;
+      }
+
+      .notice {
+        display: none;
+        border-radius: 16px;
+        padding: 14px 16px;
+        font-size: 0.95rem;
+        line-height: 1.6;
+      }
+
+      .notice[data-kind='error'] {
+        background: rgba(188, 56, 56, 0.08);
+        color: #8d2e2e;
+      }
+
+      .notice[data-kind='success'] {
+        background: rgba(34, 133, 84, 0.1);
+        color: #256142;
+      }
+
+      form {
+        display: grid;
+        gap: 14px;
+      }
+
+      label {
+        font-weight: 600;
+      }
+
+      input {
+        width: 100%;
+        border: 1px solid rgba(57, 125, 179, 0.22);
+        border-radius: 14px;
+        padding: 14px 16px;
+        font: inherit;
+        color: inherit;
+        background: rgba(255, 255, 255, 0.96);
+      }
+
+      input:focus {
+        outline: 2px solid rgba(43, 143, 220, 0.2);
+        border-color: var(--accent);
+      }
+
+      button,
+      a {
+        font: inherit;
+      }
+
+      button {
+        border: 0;
+        border-radius: 999px;
+        padding: 13px 20px;
+        color: white;
+        background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+        cursor: pointer;
+      }
+
+      .actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .link {
+        color: var(--accent-strong);
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p>Private Resume</p>
+      <h1>访问前验证</h1>
+
+      <section class="stack">
+        <div class="notice" data-kind="error" id="errorNotice"></div>
+        <div class="notice" data-kind="success" id="successNotice"></div>
+
+        <form action="/auth/qr" method="post" id="unlockForm">
+          <input type="hidden" name="next" id="nextField" value="/" />
+
+          <div class="stack">
+            <label for="token">访问密码</label>
+            <input
+              id="token"
+              name="token"
+              type="text"
+              inputmode="text"
+              autocomplete="off"
+              spellcheck="false"
+              placeholder="请输入访问密码"
+              required
+            />
+          </div>
+
+          <div class="actions">
+            <button type="submit">验证并进入</button>
+            <a class="link" href="/auth/logout">清除当前会话</a>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const next = params.get('next');
+      const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+      const error = params.get('error');
+      const loggedOut = params.get('logged_out');
+      const unlockForm = document.getElementById('unlockForm');
+      const nextField = document.getElementById('nextField');
+      const errorNotice = document.getElementById('errorNotice');
+      const successNotice = document.getElementById('successNotice');
+      const tokenInput = document.getElementById('token');
+
+      function extractToken(rawValue) {
+        const value = rawValue.trim();
+        if (!value) {
+          return '';
+        }
+
+        try {
+          const url = new URL(value);
+          const hash = new URLSearchParams(url.hash.replace(/^#/, ''));
+          return url.searchParams.get('t') || url.searchParams.get('token') || hash.get('t') || hash.get('token') || value;
+        } catch {
+          const match = value.match(/[?#&](?:t|token)=([^&#]+)/i);
+          if (match && match[1]) {
+            return decodeURIComponent(match[1]);
+          }
+
+          return value;
+        }
+      }
+
+      if (next && next.startsWith('/')) {
+        nextField.value = next;
+      }
+
+      const tokenFromHash = extractToken(hashParams.get('t') || hashParams.get('token') || '');
+      if (tokenFromHash) {
+        tokenInput.value = tokenFromHash;
+        window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}`);
+        unlockForm.requestSubmit();
+      }
+
+      if (error === 'missing-token') {
+        errorNotice.textContent = '缺少访问密码。请重新扫码，或输入有效的访问密码后再试。';
+        errorNotice.style.display = 'block';
+      }
+
+      if (error === 'invalid-token') {
+        errorNotice.textContent = '访问密码无效，或系统中不存在这条邀请记录。请重新获取新的二维码。';
+        errorNotice.style.display = 'block';
+      }
+
+      if (error === 'expired-token') {
+        errorNotice.textContent = '这条访问密码已经过期。请重新获取新的二维码。';
+        errorNotice.style.display = 'block';
+      }
+
+      if (error === 'already-used-token') {
+        errorNotice.textContent = '这是一条一次性访问密码，已经被使用过，不能再次进入。';
+        errorNotice.style.display = 'block';
+      }
+
+      if (error === 'usage-limit-reached') {
+        errorNotice.textContent = '这条访问密码已达到最大使用次数，不能继续使用。';
+        errorNotice.style.display = 'block';
+      }
+
+      if (error === 'token-config-error') {
+        errorNotice.textContent = '这条访问密码的服务端配置无效，请联系站点维护者重新生成。';
+        errorNotice.style.display = 'block';
+      }
+
+      if (loggedOut === '1') {
+        successNotice.textContent = '当前浏览器会话已清除。';
+        successNotice.style.display = 'block';
+      }
+
+      unlockForm.addEventListener('submit', () => {
+        tokenInput.value = extractToken(tokenInput.value);
+      });
+    </script>
+  </body>
+</html>
