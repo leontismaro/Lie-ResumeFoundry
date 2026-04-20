@@ -60,6 +60,10 @@ const pageTitle = '验证访问权限';
         line-height: 1.7;
       }
 
+      .lead {
+        margin-top: 8px;
+      }
+
       .stack {
         display: grid;
         gap: 18px;
@@ -139,6 +143,9 @@ const pageTitle = '验证访问权限';
     <main>
       <p>Private Resume</p>
       <h1>访问前验证</h1>
+      <p class="lead">
+        该页面需要访问密码后方可查看，扫描二维码或输入访问密码后即可继续访问。
+      </p>
 
       <section class="stack">
         <div class="notice" data-kind="error" id="errorNotice"></div>
@@ -156,6 +163,9 @@ const pageTitle = '验证访问权限';
               inputmode="text"
               autocomplete="off"
               spellcheck="false"
+              minlength="24"
+              maxlength="256"
+              pattern="[A-Za-z0-9_-]{24,256}"
               placeholder="请输入访问密码"
               required
             />
@@ -218,32 +228,42 @@ const pageTitle = '验证访问权限';
       }
 
       if (error === 'invalid-token') {
-        errorNotice.textContent = '访问密码无效，或系统中不存在这条邀请记录。请重新获取新的二维码。';
+        errorNotice.textContent = '当前访问信息暂时无法继续使用。请联系发送方重新发送最新链接。';
         errorNotice.style.display = 'block';
       }
 
       if (error === 'expired-token') {
-        errorNotice.textContent = '这条访问密码已经过期。请重新获取新的二维码。';
+        errorNotice.textContent = '当前访问链接已过期。请联系发送方重新获取最新链接。';
+        errorNotice.style.display = 'block';
+      }
+
+      if (error === 'disabled-token') {
+        errorNotice.textContent = '当前访问信息暂时无法继续使用。请联系发送方重新发送最新链接。';
         errorNotice.style.display = 'block';
       }
 
       if (error === 'already-used-token') {
-        errorNotice.textContent = '这是一条一次性访问密码，已经被使用过，不能再次进入。';
+        errorNotice.textContent = '当前访问信息暂时无法继续使用。请联系发送方重新发送最新链接。';
         errorNotice.style.display = 'block';
       }
 
       if (error === 'usage-limit-reached') {
-        errorNotice.textContent = '这条访问密码已达到最大使用次数，不能继续使用。';
+        errorNotice.textContent = '当前访问次数已用完。请联系发送方获取新的访问链接。';
         errorNotice.style.display = 'block';
       }
 
       if (error === 'token-config-error') {
-        errorNotice.textContent = '这条访问密码的服务端配置无效，请联系站点维护者重新生成。';
+        errorNotice.textContent = '当前访问信息暂时无法继续使用。请联系发送方重新发送最新链接。';
+        errorNotice.style.display = 'block';
+      }
+
+      if (error === 'too-many-attempts') {
+        errorNotice.textContent = '尝试次数较多，当前验证已暂时受限。请稍后再试，或联系发送方获取协助。';
         errorNotice.style.display = 'block';
       }
 
       if (loggedOut === '1') {
-        successNotice.textContent = '当前浏览器会话已清除。';
+        successNotice.textContent = '当前浏览器中的访问状态已清除，如需继续查看，可重新输入访问密码或打开专属链接。';
         successNotice.style.display = 'block';
       }
 

@@ -13,7 +13,9 @@
     "AUTH_COOKIE_NAME": "resume_session",
     "AUTH_SESSION_TTL_SECONDS": "1209600",
     "AUTH_QR_DEFAULT_TTL_SECONDS": "900",
-    "AUTH_PUBLIC_PATHS": "/unlock,/auth,/_astro,/favicon.ico,/favicon.svg",
+    "AUTH_QR_RATE_LIMIT_MAX_ATTEMPTS": "8",
+    "AUTH_QR_RATE_LIMIT_WINDOW_SECONDS": "600",
+    "AUTH_PUBLIC_PATHS": "/unlock,/auth/qr,/auth/logout,/_astro/*,/favicon.ico,/favicon.svg",
     "ADMIN_BASE_PATH": "/internal-console/8d98fa5f0df14cabae1ddf37cb6ef4f5",
     "ADMIN_ACCESS_DOMAIN": "https://replace-with-your-team.cloudflareaccess.com",
     "ADMIN_ACCESS_AUD": "replace-with-your-access-audience"

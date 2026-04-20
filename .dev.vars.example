@@ -15,9 +15,17 @@ AUTH_SESSION_TTL_SECONDS=1209600
 # 900 秒 = 15 分钟。
 AUTH_QR_DEFAULT_TTL_SECONDS=900
 
+# /auth/qr 在一个时间窗口内允许的最大失败尝试次数。
+AUTH_QR_RATE_LIMIT_MAX_ATTEMPTS=8
+
+# /auth/qr 失败尝试的统计窗口，单位秒。
+# 达到阈值后，会在这个窗口时长内临时阻止继续尝试。
+AUTH_QR_RATE_LIMIT_WINDOW_SECONDS=600
+
 # 明确公开放行的路径，使用英文逗号分隔。
+# 精确路径直接写路径；前缀路径请写成 "/*" 形式，例如 "/_astro/*"。
 # 语义：除这些路径和带扩展名的静态资源外，其余页面路径默认都需要 session。
-AUTH_PUBLIC_PATHS=/unlock,/auth,/_astro,/favicon.ico,/favicon.svg
+AUTH_PUBLIC_PATHS=/unlock,/auth/qr,/auth/logout,/_astro/*,/favicon.ico,/favicon.svg
 
 # 后台入口目录。建议上线前替换成你自己的长随机路径。
 ADMIN_BASE_PATH=/internal-console/8d98fa5f0df14cabae1ddf37cb6ef4f5

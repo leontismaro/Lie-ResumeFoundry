@@ -52,7 +52,7 @@ export async function onRequest(context: PagesContext) {
 
   const config = getAuthConfig(context.env);
 
-  if (isPublicPath(config.publicPaths, requestUrl.pathname)) {
+  if (isPublicPath(config.publicPaths, config.publicPathPrefixes, requestUrl.pathname)) {
     return context.next();
   }
 
