@@ -1,6 +1,71 @@
-import { getCollection, render } from 'astro:content';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
 import type { ResumeId } from './resume-catalog';
 import type { ResumeStyleId } from './resume-style-catalog';
+
+type ResumeEntry = CollectionEntry<'resume'>;
+type ResumeMetaEntry = ResumeEntry & {
+  data: {
+    hiddenSectionSlugs: string[];
+    isDefault: boolean;
+    isMaster: boolean;
+    kicker: string;
+    kind: 'meta';
+    label: string;
+    listed: boolean;
+    order: number;
+    styleId: ResumeStyleId;
+    summary: string;
+  };
+};
+type ResumeHeroEntry = ResumeEntry & {
+  data: {
+    kind: 'hero';
+    layout: 'full' | 'compact';
+    order: number;
+    sectionSlug: string;
+    title: string;
+  };
+};
+type ResumeSectionEntry = ResumeEntry & {
+  data: {
+    hidden: boolean;
+    kind: 'section';
+    layout: 'full' | 'compact';
+    order: number;
+    sectionSlug: string;
+    title: string;
+  };
+};
+type RenderedResumeEntry = ResumeEntry & {
+  Content: Awaited<ReturnType<typeof render>>['Content'];
+};
+type RenderedResumeMetaEntry = ResumeMetaEntry & RenderedResumeEntry;
+type RenderedResumeHeroEntry = ResumeHeroEntry & RenderedResumeEntry;
+type RenderedResumeSectionEntry = ResumeSectionEntry & RenderedResumeEntry;
+
+function isResumeMetaEntry(entry: ResumeEntry): entry is ResumeMetaEntry {
+  return entry.data.kind === 'meta';
+}
+
+function isResumeHeroEntry(entry: ResumeEntry): entry is ResumeHeroEntry {
+  return entry.data.kind === 'hero';
+}
+
+function isResumeSectionEntry(entry: ResumeEntry): entry is ResumeSectionEntry {
+  return entry.data.kind === 'section';
+}
+
+function isRenderedResumeMetaEntry(entry: RenderedResumeEntry): entry is RenderedResumeMetaEntry {
+  return entry.data.kind === 'meta';
+}
+
+function isRenderedResumeHeroEntry(entry: RenderedResumeEntry): entry is RenderedResumeHeroEntry {
+  return entry.data.kind === 'hero';
+}
+
+function isRenderedResumeSectionEntry(entry: RenderedResumeEntry): entry is RenderedResumeSectionEntry {
+  return entry.data.kind === 'section';
+}
 
 async function getResumeEntries(resumeId: ResumeId) {
   return (
@@ -16,7 +81,7 @@ async function getResumeEntries(resumeId: ResumeId) {
 }
 
 function getResumeMetaEntry(entries: Awaited<ReturnType<typeof getResumeEntries>>) {
-  const metaEntries = entries.filter((entry) => entry.data.kind === 'meta');
+  const metaEntries = entries.filter(isResumeMetaEntry);
 
   if (metaEntries.length !== 1) {
     throw new Error(`简历元数据配置错误: ${entries[0]?.filePath ?? 'unknown'}`);
@@ -26,7 +91,7 @@ function getResumeMetaEntry(entries: Awaited<ReturnType<typeof getResumeEntries>
 }
 
 function getResumeHeroEntry(entries: Awaited<ReturnType<typeof getResumeEntries>>) {
-  const heroEntries = entries.filter((entry) => entry.data.kind === 'hero');
+  const heroEntries = entries.filter(isResumeHeroEntry);
 
   if (heroEntries.length !== 1) {
     throw new Error(`简历 hero 配置错误: ${entries[0]?.filePath ?? 'unknown'}`);
@@ -51,13 +116,24 @@ export async function loadResumeContent(resumeId: ResumeId) {
         Content,
       };
     }),
-  );
+  ) satisfies RenderedResumeEntry[];
 
-  const hero = getResumeHeroEntry(renderedEntries);
-  const meta = getResumeMetaEntry(renderedEntries);
+  const heroEntries = renderedEntries.filter(isRenderedResumeHeroEntry);
+  const metaEntries = renderedEntries.filter(isRenderedResumeMetaEntry);
+
+  if (heroEntries.length !== 1) {
+    throw new Error(`简历 hero 配置错误: ${entries[0]?.filePath ?? 'unknown'}`);
+  }
+
+  if (metaEntries.length !== 1) {
+    throw new Error(`简历元数据配置错误: ${entries[0]?.filePath ?? 'unknown'}`);
+  }
+
+  const hero = heroEntries[0];
+  const meta = metaEntries[0];
   const hiddenSectionSlugs = new Set(meta.data.hiddenSectionSlugs);
   const sections = renderedEntries
-    .filter((entry) => entry.data.kind === 'section')
+    .filter(isRenderedResumeSectionEntry)
     .filter(
       (section) => !section.data.hidden && !hiddenSectionSlugs.has(section.data.sectionSlug),
     );

@@ -1,4 +1,4 @@
-import { getCollection } from 'astro:content';
+import { getCollection, type CollectionEntry } from 'astro:content';
 import type { ResumeStyleId } from './resume-style-catalog';
 
 const resumeContentPathPrefix = 'src/content/resumes/';
@@ -16,6 +16,25 @@ export type ResumeDefinition = {
   styleId: ResumeStyleId;
   order: number;
 };
+
+type ResumeEntry = CollectionEntry<'resume'>;
+type ResumeMetaEntry = ResumeEntry & {
+  data: {
+    isDefault: boolean;
+    isMaster: boolean;
+    kicker: string;
+    kind: 'meta';
+    label: string;
+    listed: boolean;
+    order: number;
+    styleId: ResumeStyleId;
+    summary: string;
+  };
+};
+
+function isResumeMetaEntry(entry: ResumeEntry): entry is ResumeMetaEntry {
+  return entry.data.kind === 'meta';
+}
 
 function getResumeIdFromFilePath(filePath: string | undefined) {
   if (!filePath?.startsWith(resumeContentPathPrefix)) {
@@ -42,7 +61,8 @@ function assertSingleResumeFlag(resumes: ResumeDefinition[], flag: 'isDefault' |
 }
 
 export async function getResumeCatalog() {
-  const metaEntries = await getCollection('resume', ({ data }) => data.kind === 'meta');
+  const entries = await getCollection('resume');
+  const metaEntries = entries.filter(isResumeMetaEntry);
 
   return metaEntries
     .map((entry) => ({
