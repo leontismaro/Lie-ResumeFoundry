@@ -1,5 +1,6 @@
 import { serializeCookie } from '../../src/lib/auth/cookies';
-import { getAuthConfig, normalizeAuthPath } from '../../src/lib/auth/config';
+import { getAuthConfig } from '../../src/lib/auth/config';
+import { sanitizeSitePath } from '../../src/lib/auth/paths';
 import { hashQrToken, normalizeQrToken } from '../../src/lib/auth/qr-token';
 import {
   authorizeInviteToken,
@@ -25,23 +26,6 @@ function buildRedirectResponse(location: string, headers?: HeadersInit) {
   });
 }
 
-function sanitizeNext(input: string | null, origin: string) {
-  if (!input) {
-    return '/';
-  }
-
-  try {
-    const url = new URL(input, origin);
-    if (url.origin !== origin) {
-      return '/';
-    }
-
-    return `${normalizeAuthPath(url.pathname)}${url.search}${url.hash}`;
-  } catch {
-    return '/';
-  }
-}
-
 function buildUnlockLocation(origin: string, next: string, error: string) {
   const url = new URL('/unlock', origin);
   url.searchParams.set('next', next);
@@ -55,6 +39,8 @@ function mapAuthorizationError(error: InviteAuthorizationError) {
       return 'expired-token';
     case 'already_used':
       return 'already-used-token';
+    case 'disabled':
+      return 'disabled-token';
     case 'usage_limit_reached':
       return 'usage-limit-reached';
     case 'invalid_configuration':
@@ -88,12 +74,12 @@ export async function onRequest(context: PagesContext) {
   const requestUrl = new URL(context.request.url);
   const config = getAuthConfig(context.env);
   const db = getAuthDatabase(context.env.AUTH_DB);
-  let nextPath = sanitizeNext(requestUrl.searchParams.get('next'), requestUrl.origin);
+  let nextPath = sanitizeSitePath(requestUrl.searchParams.get('next'), requestUrl.origin);
   let token: string | null = null;
 
   if (context.request.method === 'POST') {
     const formData = await context.request.formData();
-    nextPath = sanitizeNext(readStringFormValue(formData, 'next'), requestUrl.origin);
+    nextPath = sanitizeSitePath(readStringFormValue(formData, 'next'), requestUrl.origin);
     token = normalizeQrToken(readStringFormValue(formData, 'token'));
   }
 
@@ -122,7 +108,7 @@ export async function onRequest(context: PagesContext) {
     secure: requestUrl.protocol === 'https:',
   });
 
-  return buildRedirectResponse(new URL(nextPath, requestUrl.origin).toString(), {
+  return buildRedirectResponse(new URL(invite.invite.nextPath, requestUrl.origin).toString(), {
     'Set-Cookie': sessionCookie,
     'X-Robots-Tag': 'noindex, noarchive, nosnippet',
   });

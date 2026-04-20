@@ -2,11 +2,16 @@ import { clearCookie, getCookie } from '../src/lib/auth/cookies';
 import { getAuthConfig, isPublicPath, normalizeAuthPath, UNLOCK_PATH } from '../src/lib/auth/config';
 import { normalizeSessionId } from '../src/lib/auth/session';
 import { getAuthDatabase, readActiveSession } from '../src/lib/auth/storage';
+import { handleAdminRequest } from '../src/lib/admin/handler';
 
 interface PagesContext {
+  data?: Record<string, unknown>;
   env: Record<string, unknown>;
+  functionPath?: string;
   next: () => Promise<Response>;
+  passThroughOnException?: () => void;
   request: Request;
+  waitUntil?: (promise: Promise<unknown>) => void;
 }
 
 function buildRedirectResponse(location: string, headers?: HeadersInit) {
@@ -40,6 +45,11 @@ function withPrivateHeaders(response: Response) {
 
 export async function onRequest(context: PagesContext) {
   const requestUrl = new URL(context.request.url);
+  const adminResponse = await handleAdminRequest(context);
+  if (adminResponse) {
+    return withPrivateHeaders(adminResponse);
+  }
+
   const config = getAuthConfig(context.env);
 
   if (isPublicPath(config.publicPaths, requestUrl.pathname)) {

@@ -18,3 +18,19 @@ AUTH_QR_DEFAULT_TTL_SECONDS=900
 # 明确公开放行的路径，使用英文逗号分隔。
 # 语义：除这些路径和带扩展名的静态资源外，其余页面路径默认都需要 session。
 AUTH_PUBLIC_PATHS=/unlock,/auth,/_astro,/favicon.ico,/favicon.svg
+
+# 后台入口目录。建议上线前替换成你自己的长随机路径。
+ADMIN_BASE_PATH=/internal-console/8d98fa5f0df14cabae1ddf37cb6ef4f5
+
+# Cloudflare Access 应用域名，例如 https://example.cloudflareaccess.com
+ADMIN_ACCESS_DOMAIN=https://replace-with-your-team.cloudflareaccess.com
+
+# Cloudflare Access 应用对应的 Audience（aud）
+ADMIN_ACCESS_AUD=replace-with-your-access-audience
+
+# 本地调试后台时可临时关闭 Access 校验。
+# 线上不要开启。
+ADMIN_BYPASS_ACCESS=true
+
+# 本地绕过 Access 时，后台界面展示的管理员邮箱。
+ADMIN_BYPASS_USER_EMAIL=local-admin@example.com

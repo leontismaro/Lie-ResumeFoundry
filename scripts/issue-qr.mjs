@@ -227,28 +227,38 @@ function buildInviteSql(record) {
     insert into invite_tokens (
       id,
       token_hash,
+      next_path,
+      note,
       mode,
       max_uses,
       used_count,
       expires_at,
       consumed_at,
-      created_at,
-      note,
       session_policy,
-      session_ttl_seconds
+      session_ttl_seconds,
+      disabled_at,
+      disabled_reason,
+      created_at,
+      created_by,
+      updated_at
     )
     values (
       '${sqlEscape(record.id)}',
       '${sqlEscape(record.tokenHash)}',
+      '${sqlEscape(record.nextPath)}',
+      ${record.note ? `'${sqlEscape(record.note)}'` : 'null'},
       '${sqlEscape(record.mode)}',
       ${record.maxUses ?? 'null'},
       0,
       ${record.expiresAt},
       null,
-      ${record.createdAt},
-      ${record.note ? `'${sqlEscape(record.note)}'` : 'null'},
       '${sqlEscape(record.sessionPolicy)}',
-      ${record.sessionTtlSeconds}
+      ${record.sessionTtlSeconds},
+      null,
+      null,
+      ${record.createdAt},
+      null,
+      ${record.createdAt}
     )
   `;
 }
@@ -299,6 +309,7 @@ async function main() {
     id: crypto.randomUUID(),
     maxUses: options.maxUses,
     mode: options.mode,
+    nextPath: options.next,
     note: options.note,
     sessionPolicy: options.sessionPolicy,
     sessionTtlSeconds: options.sessionTtlMinutes * 60,

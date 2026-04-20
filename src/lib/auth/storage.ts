@@ -8,11 +8,13 @@ export interface D1RunResult {
 
 export interface D1FirstResult<T> {
   first<TValue = T>(): Promise<TValue | null>;
+  all<TValue = T>(): Promise<{ results: TValue[] }>;
   run(): Promise<D1RunResult>;
 }
 
 export interface D1PreparedStatement {
   bind(...values: unknown[]): D1FirstResult<unknown>;
+  all<TValue = unknown>(): Promise<{ results: TValue[] }>;
 }
 
 export interface D1DatabaseLike {
@@ -25,15 +27,18 @@ export type InviteAuthorizationError =
   | 'not_found'
   | 'expired'
   | 'already_used'
+  | 'disabled'
   | 'usage_limit_reached'
   | 'invalid_configuration';
 
 interface InviteTokenRow {
   id: string;
   consumed_at: number | null;
+  disabled_at: number | null;
   expires_at: number;
   max_uses: number | null;
   mode: string;
+  next_path: string;
   session_policy: string | null;
   session_ttl_seconds: number | null;
   used_count: number | null;
@@ -43,12 +48,14 @@ export interface InviteAuthorization {
   expiresAt: number;
   inviteId: string;
   mode: InviteMode;
+  nextPath: string;
   sessionPolicy: SessionPolicy;
   sessionTtlSeconds: number | null;
 }
 
 interface StoredInviteToken extends InviteAuthorization {
   consumedAt: number | null;
+  disabledAt: number | null;
   maxUses: number | null;
   usedCount: number;
 }
@@ -123,10 +130,12 @@ async function readInviteToken(
       `
         select
           id,
+          next_path,
           mode,
           max_uses,
           expires_at,
           consumed_at,
+          disabled_at,
           used_count,
           session_policy,
           session_ttl_seconds
@@ -159,12 +168,21 @@ async function readInviteToken(
     };
   }
 
+  if (row.disabled_at) {
+    return {
+      error: 'disabled' as const,
+      ok: false as const,
+    };
+  }
+
   const invite: StoredInviteToken = {
     consumedAt: row.consumed_at,
+    disabledAt: row.disabled_at,
     expiresAt: row.expires_at,
     inviteId: row.id,
     maxUses: normalizePositiveInt(row.max_uses),
     mode,
+    nextPath: row.next_path,
     sessionPolicy: normalizeSessionPolicy(row.session_policy),
     sessionTtlSeconds: normalizePositiveInt(row.session_ttl_seconds),
     usedCount: normalizePositiveInt(row.used_count) ?? 0,
@@ -212,6 +230,24 @@ async function incrementLimitedInvite(db: D1DatabaseLike, tokenHash: string, now
     .run();
 
   return (result.meta?.changes ?? 0) > 0;
+}
+
+async function markReusableInvite(db: D1DatabaseLike, tokenHash: string, now: number) {
+  await db
+    .prepare(
+      `
+        update invite_tokens
+        set
+          used_count = used_count + 1,
+          consumed_at = coalesce(consumed_at, ?),
+          updated_at = ?
+        where token_hash = ?
+          and expires_at > ?
+          and disabled_at is null
+      `,
+    )
+    .bind(now, now, tokenHash, now)
+    .run();
 }
 
 export async function authorizeInviteToken(
@@ -268,11 +304,16 @@ export async function authorizeInviteToken(
     }
   }
 
+  if (invite.mode === 'reusable_until_expire') {
+    await markReusableInvite(db, tokenHash, now);
+  }
+
   return {
     invite: {
       expiresAt: invite.expiresAt,
       inviteId: invite.inviteId,
       mode: invite.mode,
+      nextPath: invite.nextPath,
       sessionPolicy: invite.sessionPolicy,
       sessionTtlSeconds: invite.sessionTtlSeconds,
     },
@@ -349,5 +390,18 @@ export async function revokeSession(db: D1DatabaseLike, sessionId: string, now: 
       `,
     )
     .bind(now, sessionId)
+    .run();
+}
+
+export async function revokeSessionsByInviteId(db: D1DatabaseLike, inviteId: string, now: number) {
+  await db
+    .prepare(
+      `
+        update sessions
+        set revoked_at = coalesce(revoked_at, ?)
+        where invite_id = ?
+      `,
+    )
+    .bind(now, inviteId)
     .run();
 }
