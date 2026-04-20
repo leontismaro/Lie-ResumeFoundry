@@ -124,7 +124,7 @@ order: 0
 - `contacts`
   联系方式数组。
 - `sectionSlug`
-  当前固定为 `profile`。
+  固定为 `profile`。
 - `layout`
   对 hero 来说通常保持 `full`。
 - `order`
@@ -168,7 +168,7 @@ order: 1
 可选字段：
 
 - `hidden: true`
-  单独隐藏当前区块。即使文件仍然存在，也不会渲染。
+  单独隐藏该区块。即使文件仍然存在，也不会渲染。
 
 ## 方法一：使用脚本快速创建一份简历
 
@@ -218,7 +218,7 @@ npm run create-resume -- \
 - `--style`
   目标样式，默认 `glass`。
 - `--order`
-  简历排序值。不传时自动追加到当前列表末尾。
+  简历排序值。不传时自动追加到列表末尾。
 - `--listed`
   是否显示在 `/resumes`。
 - `--default`
@@ -357,7 +357,7 @@ order: 5
 
 有两种方式。
 
-方式一，在当前 section 文件中直接隐藏：
+方式一，在对应 section 文件中直接隐藏：
 
 ```md
 ---
@@ -386,7 +386,7 @@ hiddenSectionSlugs:
 
 `layout` 是区块的展示提示，而不是内容类型本身。
 
-当前项目支持：
+项目支持：
 
 - `full`
 - `compact`
@@ -402,8 +402,8 @@ hiddenSectionSlugs:
 
 - `layout` 并不直接决定“必须出现在左栏还是右栏”
 - 最终如何排版，由具体样式组件决定
-- 当前 `glass` 样式会利用 `layout` 做主栏 / 侧栏区分
-- 当前 `editorial` 样式通常按内容顺序单栏渲染
+- `glass` 样式会利用 `layout` 做主栏 / 侧栏区分
+- `editorial` 样式通常按内容顺序单栏渲染
 
 ## 本地预览
 
@@ -412,6 +412,12 @@ hiddenSectionSlugs:
 ```sh
 npm run dev
 ```
+
+说明：
+
+- 该命令会在启动前自动执行 `scripts/generate-admin-route-options.mjs`
+- 后台创建 token 时使用的目标路径下拉列表会同步刷新
+- 当你新增简历、调整 `isMaster`、修改简历名称或排序后，重新执行一次 `npm run dev` 或 `npm run build`，即可让后台下拉项与内容目录保持一致
 
 访问：
 

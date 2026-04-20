@@ -3,15 +3,15 @@
 ![Project Cover](./docs/images/cover.png)
 ![Project Cover 02](./docs/images/cover02.png)
 
-一个基于 Astro 与 Cloudflare Pages 构建的私有化简历站点模板，面向“多版本简历管理 + 多样式渲染 + 二维码受控访问”的使用场景。
+一个基于 Astro 与 Cloudflare Pages 构建的私有化简历站点模板，面向“多版本简历管理 + 多样式渲染 + 受控访问发布”的使用场景。
 
-项目的核心目标不是只生成一份静态简历，而是提供一套可以长期维护的简历发布方案：
+项目关注的不只是静态页面生成，而是一套可长期维护、可按岗位拆分、可控制访问入口的简历发布方案：
 
 - 使用 Markdown 驱动简历内容
-- 支持同一仓库下维护多份简历版本
-- 支持为不同简历选择不同渲染样式
-- 支持通过二维码邀请链接控制访问入口
-- 支持部署到 Cloudflare Pages，并使用 Pages Functions + D1 实现访问拦截与服务端 session
+- 在同一仓库中维护多份简历版本
+- 为不同简历版本指定不同渲染样式
+- 通过二维码与邀请链接控制访问入口
+- 使用 Pages Functions、D1 与 Cloudflare Access 形成完整的发布与管理链路
 
 ## 项目提供的功能
 
@@ -30,18 +30,18 @@
 src/content/resumes/<resume-id>/
 ```
 
-并通过 `_meta.md`、`00-profile.md` 和 section 文件共同驱动渲染。
+并通过 `_meta.md`、`00-profile.md` 与 section 文件共同驱动渲染。
 
 ### 2. 多样式渲染
 
-项目当前已内置两套样式：
+项目内置两套样式：
 
 - `glass`
-  蓝色玻璃风，强调卡片感、双栏布局与强视觉层级
+  蓝色玻璃风，强调卡片感、双栏布局与视觉层次
 - `editorial`
-  社论排版风，强调单栏阅读、留白和内容节奏
+  社论排版风，强调单栏阅读、留白与内容节奏
 
-每份简历可以在自己的 `_meta.md` 中声明 `styleId`，从而独立选择样式，而不需要复制内容。
+每份简历可在 `_meta.md` 中声明 `styleId`，从而独立选择样式，而无需复制正文内容。
 
 ### 3. Web / Print 双输出
 
@@ -55,32 +55,46 @@ src/content/resumes/<resume-id>/
 - `/`
 - `/print`
 
-因此，本项目同时适用于在线浏览与 PDF 导出场景。
+因此，项目可同时满足在线浏览与 PDF 导出需求。
 
 ### 4. 内容驱动维护
 
-简历数量、名称、排序、是否展示、默认样式、主简历归属等核心元数据均来自内容目录自身，而不是额外的硬编码表。
+简历数量、名称、排序、是否展示、默认样式、主简历归属等核心元数据均来自内容目录，而不是额外的硬编码表。
 
 这意味着：
 
 - 新增简历时主要工作集中在内容目录
-- 简历维护更接近“编辑内容”而不是“改代码”
-- 更适合长期迭代和多人协作
+- 简历维护更接近内容编辑，而不是模板复制
+- 内容与展示层保持稳定分离
 
-### 5. 二维码受控访问
+### 5. 受控访问与后台管理
 
-项目内置发码脚本，可直接生成：
+项目提供两条相互配合的访问控制能力：
 
-- 邀请链接
-- 对应二维码 SVG
+- 使用脚本或后台控制台创建 token
+- 通过 `/unlock`、`/auth/qr` 与服务端 session 控制受保护页面访问
 
-并支持：
+支持的 token 模式包括：
 
 - `single_use`
 - `reusable_until_expire`
 - `limited_uses`
 
-三种邀请码模式，以及不同的 session 生命周期策略。
+支持的 session 策略包括：
+
+- `fixed_ttl`
+- `cap_to_invite_expiry`
+
+项目同时提供受 Cloudflare Access 保护的后台 token 管理控制台，用于：
+
+- 创建 token
+- 禁用 token
+- 启用 token
+- 延长有效期
+- 增加限次 token 的可用次数
+- 按 token 吊销已签发的 session
+
+简历正文仍通过 Markdown 文件维护，后台不承担在线内容编辑职责。
 
 ### 6. Cloudflare 部署链路
 
@@ -89,13 +103,14 @@ src/content/resumes/<resume-id>/
 - Cloudflare Pages
 - Pages Functions
 - D1
+- Cloudflare Access
 
 用于实现：
 
-- 访问拦截
+- 页面访问拦截
 - 邀请 token 校验
 - 服务端 session 创建与吊销
-- 会话失效后的重定向
+- 后台路径认证与管理员身份识别
 
 ## 项目优势
 
@@ -103,41 +118,21 @@ src/content/resumes/<resume-id>/
 
 简历内容与样式实现分离：
 
-- 内容层负责“写什么”
-- 样式层负责“怎么展示”
+- 内容层负责信息组织
+- 样式层负责呈现方式
 
-这使得同一份内容可以被不同样式复用，也使新增样式时不需要复制现有简历正文。
+这使得同一份内容可以复用到不同样式，也使新增样式时无需复制既有正文。
 
-### 适合真实投递场景
 
-项目不是单纯的静态简历页面，而是更贴近真实投递流程：
+### 安全边界清晰
 
-- 可以维护一份主简历和多份定制版
-- 可以为不同岗位指定不同入口
-- 可以控制访问链接的有效期与使用次数
+项目的访问与后台边界明确：
 
-### 部署形态清晰
-
-项目当前部署模型明确且单一：
-
-- Astro 负责构建静态页面
-- Cloudflare Pages 托管站点
-- Pages Functions 负责鉴权
-- D1 保存邀请码与 session
-
-没有额外引入不必要的后台服务，复杂度可控。
-
-### 可扩展但不过度设计
-
-项目已经支持：
-
-- 新增简历
-- 新增样式
-- 新增区块
-- 隐藏区块
-- 调整默认简历
-
-但仍然保持了较低的心智负担。日常编辑主要集中在 `src/content/resumes/` 目录中。
+- 公开路径由显式白名单控制
+- 受保护页面统一经由 session 校验
+- `/auth/qr` 具备失败尝试限流
+- 后台写接口执行同源校验
+- 后台入口由 Cloudflare Access 保护
 
 ## 适用场景
 
@@ -145,10 +140,8 @@ src/content/resumes/<resume-id>/
 
 - 维护一份长期可演进的个人简历站
 - 面向不同岗位维护多套简历版本
-- 需要通过二维码或短期链接控制访问
-- 希望将简历站部署到 Cloudflare Pages
-
-本项目提供的鉴权与多版本能力。
+- 通过二维码或专属链接控制访问范围
+- 将简历站部署到 Cloudflare Pages
 
 ## 快速开始
 
@@ -157,7 +150,7 @@ src/content/resumes/<resume-id>/
 - Node.js `>= 22.12.0`
 - `npm`
 - Cloudflare 账号
-- Wrangler CLI 登录能力
+- 已安装并可使用 Wrangler
 
 ### 1. 安装依赖
 
@@ -165,7 +158,21 @@ src/content/resumes/<resume-id>/
 npm install
 ```
 
-### 2. 仅预览前端页面
+### 2. 准备本地环境变量
+
+```sh
+cp ".dev.vars.example" ".dev.vars"
+```
+
+`.dev.vars.example` 中包含本地运行后台控制台所需的默认示例配置。默认示例启用了：
+
+```text
+ADMIN_BYPASS_ACCESS=true
+```
+
+该变量仅用于本地调试后台，生产环境不应启用。
+
+### 3. 仅预览前端页面
 
 ```sh
 npm run dev
@@ -182,29 +189,25 @@ npm run dev
 - 调整样式
 - 检查页面布局
 
-但不适合验证：
+此模式不验证：
 
-- Cloudflare Pages Functions
+- Pages Functions
 - D1
-- 邀请码登录链路
+- token 登录链路
+- 后台控制台
 
-### 3. 初始化本地 D1
+### 4. 初始化本地 D1
 
-如果需要完整验证鉴权链路，先初始化本地数据库：
+如需完整验证鉴权与后台链路，先初始化本地数据库：
 
 ```sh
 npx wrangler d1 execute "lies-resumefoundry-auth" --local --file "database/schema.sql"
 ```
 
-### 4. 构建项目
-
-```sh
-npm run build
-```
-
 ### 5. 使用 Pages 本地运行时启动
 
 ```sh
+npm run build
 npx wrangler pages dev "dist" --port 8788 --ip 127.0.0.1
 ```
 
@@ -215,8 +218,31 @@ npx wrangler pages dev "dist" --port 8788 --ip 127.0.0.1
 - `/auth/logout`
 - session cookie
 - D1 访问
+- 后台控制台
 
-### 6. 生成本地测试邀请码
+### 6. 打开本地后台
+
+后台入口由 `ADMIN_BASE_PATH` 指定。默认示例值为：
+
+```text
+/internal-console/8d98fa5f0df14cabae1ddf37cb6ef4f5
+```
+
+本地访问地址为：
+
+```text
+http://127.0.0.1:8788/internal-console/8d98fa5f0df14cabae1ddf37cb6ef4f5
+```
+
+### 7. 生成本地测试邀请码
+
+项目支持两种方式：
+
+#### 方式 A：通过后台控制台生成
+
+适合人工发放与日常管理。
+
+#### 方式 B：通过脚本生成
 
 ```sh
 npm run issue-qr -- \
@@ -229,23 +255,32 @@ npm run issue-qr -- \
 
 脚本会：
 
-- 向本地 D1 写入一个 invite token
+- 向本地 D1 写入 invite token
 - 在 `generated-qr/` 下生成二维码 SVG
 - 输出可直接访问的邀请链接
+
+## 文档
+
+- [创建与编辑简历](./docs/create-and-edit-a-resume.md)
+- [创建新的样式](./docs/create-a-new-style.md)
+- [使用脚本生成二维码与邀请链接](./docs/generate-qr-codes-and-links.md)
+- [后台 Token 管理](./docs/admin-token-management.md)
+- [部署到 Cloudflare](./docs/deploy-to-cloudflare.md)
 
 ## 项目结构概览
 
 ```text
 .
 ├── docs/                         # 文档
-├── database/                     # D1 schema
+├── database/                     # D1 schema 与数据库脚本
 ├── functions/                    # Cloudflare Pages Functions
 ├── public/                       # 静态资源
 ├── scripts/                      # 创建简历、生成二维码等脚本
 ├── src/
 │   ├── components/               # 通用组件与样式组件
 │   ├── content/resumes/          # 简历内容目录
-│   ├── lib/                      # 内容装配、样式目录、鉴权基础库
+│   ├── generated/                # 构建期生成文件
+│   ├── lib/                      # 内容装配、后台与鉴权逻辑
 │   ├── pages/                    # 页面路由
 │   └── styles/                   # 通用样式与主题样式
 ├── package.json
@@ -258,105 +293,9 @@ npm run issue-qr -- \
   所有简历内容的单一事实来源
 - `src/components/resume-styles/`
   各个样式的 Web / Print 渲染实现
+- `src/lib/admin/`
+  后台控制台与 token 管理逻辑
+- `src/lib/auth/`
+  token、session、路径校验与限流逻辑
 - `functions/`
-  Cloudflare Pages Functions 鉴权入口
-- `scripts/`
-  日常维护脚本
-- `database/schema.sql`
-  D1 表结构
-
-## 文档导航
-
-以下文档提供了面向仓库用户的详细说明：
-
-- [创建与编辑简历](./docs/create-and-edit-a-resume.md)
-- [创建新的样式](./docs/create-a-new-style.md)
-- [使用脚本生成二维码与邀请链接](./docs/generate-qr-codes-and-links.md)
-- [部署到 Cloudflare](./docs/deploy-to-cloudflare.md)
-
-建议的阅读顺序：
-
-1. 先阅读本文，理解项目定位与结构
-2. 再阅读“创建与编辑简历”
-3. 若需要扩展视觉层，再阅读“创建新的样式”
-4. 若要进入上线阶段，再阅读“生成二维码”与“部署到 Cloudflare”
-
-## 常用命令
-
-```sh
-# 安装依赖
-npm install
-
-# 前端开发
-npm run dev
-
-# 构建
-npm run build
-
-# 创建一份新简历
-npm run create-resume -- --id "staff-backend"
-
-# 生成邀请二维码
-npm run issue-qr -- --base-url "https://resume.example.com"
-```
-
-## 依赖项目与基础组件
-
-本项目建立在以下核心依赖之上：
-
-- [Astro](https://astro.build/)
-  负责内容站点构建与页面路由
-- [Cloudflare Pages](https://pages.cloudflare.com/)
-  负责托管构建产物与运行 Pages Functions
-- [Cloudflare Pages Functions](https://developers.cloudflare.com/pages/functions/)
-  负责页面访问拦截、登录流转和退出登录
-- [Cloudflare D1](https://developers.cloudflare.com/d1/)
-  负责保存邀请码与 session
-- [Wrangler](https://developers.cloudflare.com/workers/wrangler/)
-  负责本地调试、D1 操作与部署
-- [QRCode](https://www.npmjs.com/package/qrcode)
-  负责生成二维码 SVG
-- [TypeScript](https://www.typescriptlang.org/)
-  负责类型检查与内容 schema 约束
-
-对应的主要仓库依赖定义可在 [package.json](./package.json) 中查看。
-
-## 当前路由形态
-
-项目当前默认提供以下主要路由：
-
-- `/`
-  主简历网页版
-- `/print`
-  主简历打印版
-- `/resumes`
-  简历目录页
-- `/resume/<id>`
-  某份简历的网页版
-- `/resume/<id>/print`
-  某份简历的打印版
-- `/unlock`
-  邀请验证入口
-
-## 维护建议
-
-日常维护时，优先修改以下内容：
-
-- `src/content/resumes/<resume-id>/_meta.md`
-- `src/content/resumes/<resume-id>/00-profile.md`
-- `src/content/resumes/<resume-id>/*.md`
-
-只有在以下场景中，才需要改动代码层：
-
-- 新增一种样式
-- 调整样式组件的布局策略
-- 修改鉴权逻辑
-- 修改二维码生成逻辑
-- 扩展部署与运行方式
-
-## 许可证
-
-本项目采用 `Apache License 2.0`。
-
-- 完整许可证文本见 [LICENSE](./LICENSE)
-- 官方许可证来源：<https://www.apache.org/licenses/LICENSE-2.0.txt>
+  Pages Functions 入口
