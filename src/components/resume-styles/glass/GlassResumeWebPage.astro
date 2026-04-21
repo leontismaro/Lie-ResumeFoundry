@@ -96,24 +96,6 @@ const primaryActionLabel = primarySection ? `查看${primarySection.data.title}`
       </section>
 
       <section class="resume-layout">
-        <aside class="resume-sidebar">
-          {
-            sideSections.map((section) => (
-              <ResumeSection
-                id={section.data.sectionSlug}
-                title={section.data.title}
-                subtitle={section.data.subtitle}
-                summary={section.data.summary}
-                slug={section.data.sectionSlug}
-                layout={section.data.layout}
-                tone="secondary"
-              >
-                <section.Content />
-              </ResumeSection>
-            ))
-          }
-        </aside>
-
         <div class="resume-main">
           {
             mainSections.map((section) => (
@@ -131,6 +113,24 @@ const primaryActionLabel = primarySection ? `查看${primarySection.data.title}`
             ))
           }
         </div>
+
+        <aside class="resume-sidebar">
+          {
+            sideSections.map((section) => (
+              <ResumeSection
+                id={section.data.sectionSlug}
+                title={section.data.title}
+                subtitle={section.data.subtitle}
+                summary={section.data.summary}
+                slug={section.data.sectionSlug}
+                layout={section.data.layout}
+                tone="secondary"
+              >
+                <section.Content />
+              </ResumeSection>
+            ))
+          }
+        </aside>
       </section>
     </main>
   </body>

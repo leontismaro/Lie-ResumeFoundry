@@ -71,6 +71,41 @@ html {
   gap: 10px;
 }
 
+.site-nav-mobile {
+  display: none;
+}
+
+.site-nav-breadcrumb {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  padding: 0.42rem 0.78rem;
+  border: 1px solid rgba(255, 255, 255, 0.58);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.54);
+}
+
+.site-nav-breadcrumb-separator {
+  flex: none;
+  margin: 0 0.45rem;
+  color: rgba(28, 111, 152, 0.38);
+}
+
+.site-nav-crumb {
+  min-width: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.site-nav-crumb-current {
+  color: var(--ink);
+  font-weight: 600;
+}
+
 .site-nav-link {
   padding: 0.48rem 0.88rem;
   border-radius: 999px;
@@ -250,12 +285,16 @@ html {
 
 .resume-sidebar {
   display: grid;
+  grid-column: 1;
+  grid-row: 1;
   align-content: start;
   gap: 24px;
 }
 
 .resume-main {
   display: grid;
+  grid-column: 2;
+  grid-row: 1;
   gap: 24px;
 }
 
@@ -437,20 +476,40 @@ html {
     grid-template-columns: 1fr;
   }
 
-  .resume-section-skills .resume-section-body ul {
-    grid-template-columns: 1fr;
-    columns: 1;
+  .resume-sidebar,
+  .resume-main {
+    grid-column: auto;
+    grid-row: auto;
   }
 }
 
 @media (max-width: 700px) {
   .site-nav {
-    align-items: flex-start;
+    padding: 12px 14px;
     border-radius: 22px;
   }
 
+  .site-nav-brand,
   .site-nav-links {
-    justify-content: flex-start;
+    display: none;
+  }
+
+  .site-nav-mobile {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .site-nav-breadcrumb {
+    min-width: 0;
+    padding-inline: 0.72rem;
+  }
+
+  .site-nav-link-mobile-print {
+    padding-inline: 0.78rem;
+    white-space: nowrap;
   }
 
   .resume-hero-title {
@@ -459,6 +518,31 @@ html {
 
   .resume-section {
     padding-inline: 20px;
+  }
+
+  .resume-section-skills .resume-section-body ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.72rem;
+    margin-top: 0.9rem;
+    padding-left: 0;
+    list-style: none;
+    columns: initial;
+  }
+
+  .resume-section-skills .resume-section-body li {
+    margin: 0;
+    padding: 0.46rem 0.8rem;
+    border: 1px solid rgba(47, 143, 190, 0.14);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.72);
+    box-shadow: 0 8px 18px rgba(35, 92, 120, 0.06);
+    break-inside: auto;
+    line-height: 1.28;
+  }
+
+  .resume-section-skills .resume-section-body li + li {
+    margin-top: 0;
   }
 
   .resume-section-experience .resume-section-body > *:not(h3),

@@ -12,6 +12,10 @@ interface Props {
 }
 
 const { name, subtitle, items, printHref } = Astro.props;
+const mobileCurrentItem = items[0] ?? {
+  href: '#top',
+  label: '总览',
+};
 ---
 
 <header class="site-nav-shell">
@@ -33,5 +37,173 @@ const { name, subtitle, items, printHref } = Astro.props;
         打印版
       </a>
     </nav>
+
+    <nav
+      class="site-nav-mobile"
+      aria-label="移动端页面导航"
+      data-site-nav-mobile
+      data-nav-items={JSON.stringify(items)}
+    >
+      <div class="site-nav-breadcrumb">
+        <a class="site-nav-crumb" href="#top">{name}</a>
+        <span class="site-nav-breadcrumb-separator" aria-hidden="true">
+          /
+        </span>
+        <a
+          class="site-nav-crumb site-nav-crumb-current"
+          href={mobileCurrentItem.href}
+          data-site-nav-current
+        >
+          {mobileCurrentItem.label}
+        </a>
+      </div>
+
+      <a
+        href={printHref}
+        class="site-nav-link site-nav-link-print site-nav-link-mobile-print"
+        target="_blank"
+        rel="noreferrer"
+      >
+        打印版
+      </a>
+    </nav>
   </div>
 </header>
+
+<script is:inline>
+  (() => {
+    const initMobileBreadcrumb = () => {
+      const mobileNav = document.querySelector('[data-site-nav-mobile]');
+      if (!(mobileNav instanceof HTMLElement)) {
+        return;
+      }
+
+      const currentLink = mobileNav.querySelector('[data-site-nav-current]');
+      if (!(currentLink instanceof HTMLAnchorElement)) {
+        return;
+      }
+
+      const rawItems = mobileNav.dataset.navItems;
+      if (!rawItems) {
+        return;
+      }
+
+      let navItems;
+
+      try {
+        navItems = JSON.parse(rawItems);
+      } catch {
+        return;
+      }
+
+      const trackedSections = navItems
+        .map((item) => {
+          if (
+            !item ||
+            typeof item.href !== 'string' ||
+            !item.href.startsWith('#') ||
+            typeof item.label !== 'string'
+          ) {
+            return null;
+          }
+
+          const sectionElement = document.getElementById(item.href.slice(1));
+          if (!sectionElement) {
+            return null;
+          }
+
+          return {
+            href: item.href,
+            label: item.label,
+            element: sectionElement,
+          };
+        })
+        .filter(Boolean)
+        .sort((left, right) => {
+          if (left.element === right.element) {
+            return 0;
+          }
+
+          const position = left.element.compareDocumentPosition(right.element);
+
+          if (position & Node.DOCUMENT_POSITION_FOLLOWING) {
+            return -1;
+          }
+
+          if (position & Node.DOCUMENT_POSITION_PRECEDING) {
+            return 1;
+          }
+
+          return 0;
+        });
+
+      if (!trackedSections.length) {
+        currentLink.href = '#top';
+        currentLink.textContent = '总览';
+        currentLink.setAttribute('aria-label', '当前章节：总览');
+        return;
+      }
+
+      const setCurrentItem = (item) => {
+        currentLink.href = item.href;
+        currentLink.textContent = item.label;
+        currentLink.setAttribute('aria-label', `当前章节：${item.label}`);
+      };
+
+      const resolveCurrentItem = () => {
+        const pivot = Math.max(128, window.innerHeight * 0.24);
+        let currentItem = null;
+
+        for (const item of trackedSections) {
+          if (item.element.getBoundingClientRect().top <= pivot) {
+            currentItem = item;
+            continue;
+          }
+
+          break;
+        }
+
+        return currentItem;
+      };
+
+      let rafId = 0;
+
+      const syncCurrentItem = () => {
+        const currentItem = resolveCurrentItem();
+
+        if (!currentItem) {
+          currentLink.href = '#top';
+          currentLink.textContent = '总览';
+          currentLink.setAttribute('aria-label', '当前章节：总览');
+          return;
+        }
+
+        setCurrentItem(currentItem);
+      };
+
+      const requestSync = () => {
+        if (rafId) {
+          return;
+        }
+
+        rafId = window.requestAnimationFrame(() => {
+          rafId = 0;
+          syncCurrentItem();
+        });
+      };
+
+      window.addEventListener('scroll', requestSync, { passive: true });
+      window.addEventListener('resize', requestSync);
+      window.addEventListener('hashchange', requestSync);
+
+      syncCurrentItem();
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initMobileBreadcrumb, { once: true });
+      return;
+    }
+
+    initMobileBreadcrumb();
+  })();
+</script>
