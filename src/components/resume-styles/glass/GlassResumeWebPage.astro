@@ -1,7 +1,13 @@
 ---
 import ResumeNav from '../../ResumeNav.astro';
 import ResumeSection from '../../ResumeSection.astro';
+import SummaryPills from '../../SummaryPills.astro';
 import ProfileMetaGrid from '../../ProfileMetaGrid.astro';
+import {
+  joinResumeSummary,
+  normalizeResumeSummary,
+  type ResumeSummary,
+} from '../../../lib/resume-summary';
 import { getCanonicalUrl, withBase } from '../../../lib/site';
 import '../../../styles/resume-themes/glass-web.css';
 
@@ -9,7 +15,7 @@ interface ResumeEntry {
   data: {
     title: string;
     subtitle?: string;
-    summary?: string;
+    summary?: ResumeSummary;
     sectionSlug: string;
     layout: 'full' | 'compact';
   };
@@ -21,7 +27,7 @@ interface Props {
     data: {
       title: string;
       subtitle?: string;
-      summary?: string;
+      summary?: ResumeSummary;
       contacts?: Array<{
         label?: string;
         value?: string;
@@ -36,12 +42,16 @@ interface Props {
   }>;
   sections: ResumeEntry[];
   primarySection?: ResumeEntry | null;
-  kicker: string;
+  kicker?: string;
   printHref: string;
 }
 
 const { hero, navItems, sections, primarySection, kicker, printHref } = Astro.props;
-const pageDescription = hero.data.summary ?? '简历内容';
+const heroSummaryText =
+  typeof hero.data.summary === 'string' ? joinResumeSummary(hero.data.summary) : undefined;
+const heroSummaryItems =
+  Array.isArray(hero.data.summary) ? normalizeResumeSummary(hero.data.summary) : [];
+const pageDescription = joinResumeSummary(hero.data.summary) ?? '简历内容';
 const mainSections = sections.filter((section) => section.data.layout === 'full');
 const sideSections = sections.filter((section) => section.data.layout !== 'full');
 const primaryActionHref = primarySection ? `#${primarySection.data.sectionSlug}` : '#top';
@@ -74,10 +84,17 @@ const canonicalUrl = getCanonicalUrl(Astro.url, Astro.site);
 
       <section class="resume-hero">
         <div class="resume-hero-copy">
-          <p class="resume-hero-kicker">{kicker} / Resume</p>
+          {kicker && <p class="resume-hero-kicker">{kicker} / Resume</p>}
           <h1 class="resume-hero-title">{hero.data.title}</h1>
           {hero.data.subtitle && <p class="resume-hero-role">{hero.data.subtitle}</p>}
-          {hero.data.summary && <p class="resume-hero-summary">{hero.data.summary}</p>}
+          {heroSummaryText && <p class="resume-hero-summary">{heroSummaryText}</p>}
+          {heroSummaryItems.length > 0 && (
+            <SummaryPills
+              items={heroSummaryItems}
+              className="resume-hero-summary-pills"
+              itemClassName="resume-hero-summary-pill"
+            />
+          )}
 
           <div class="resume-hero-actions">
             <a class="resume-button resume-button-primary" href={primaryActionHref}>

@@ -70,10 +70,23 @@ html {
 }
 
 .editorial-hero-summary {
-  margin: 1.1rem 0 0;
-  max-width: 34rem;
-  color: var(--editorial-muted);
+  margin: 0.88rem 0 0;
+  max-width: 40rem;
+  color: inherit;
   font-size: 1rem;
+  line-height: 1.38;
+}
+
+.editorial-hero-summary-pills {
+  margin-top: 0.86rem;
+}
+
+.editorial-hero-summary-pill {
+  padding-inline: 0.68rem;
+  border-color: rgba(139, 75, 44, 0.14);
+  background: rgba(139, 75, 44, 0.08);
+  color: #74442b;
+  box-shadow: 0 4px 10px rgba(75, 54, 36, 0.05);
 }
 
 .editorial-hero-actions {
@@ -217,8 +230,20 @@ html {
 }
 
 .editorial-section-summary {
-  margin: 0.9rem 0 0;
-  color: var(--editorial-muted);
+  margin: 0.56rem 0 0;
+  color: inherit;
+  line-height: 1.38;
+}
+
+.editorial-section-summary-pills {
+  margin-top: 0.62rem;
+}
+
+.editorial-section-summary-pill {
+  border-color: rgba(139, 75, 44, 0.1);
+  background: rgba(255, 255, 255, 0.62);
+  color: #6f655b;
+  font-size: 0.76rem;
 }
 
 .editorial-section-body {

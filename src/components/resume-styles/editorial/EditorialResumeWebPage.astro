@@ -1,6 +1,12 @@
 ---
 import EditorialSkillsSection from './EditorialSkillsSection.astro';
 import ProfileMetaGrid from '../../ProfileMetaGrid.astro';
+import SummaryPills from '../../SummaryPills.astro';
+import {
+  joinResumeSummary,
+  normalizeResumeSummary,
+  type ResumeSummary,
+} from '../../../lib/resume-summary';
 import { parseResumeSkillGroups } from '../../../lib/resume-skill-groups';
 import { getCanonicalUrl, withBase } from '../../../lib/site';
 import '../../../styles/resume-themes/editorial-web.css';
@@ -9,7 +15,7 @@ interface ResumeEntry {
   data: {
     title: string;
     subtitle?: string;
-    summary?: string;
+    summary?: ResumeSummary;
     sectionSlug: string;
   };
   Content: any;
@@ -20,7 +26,7 @@ interface Props {
     data: {
       title: string;
       subtitle?: string;
-      summary?: string;
+      summary?: ResumeSummary;
       contacts?: Array<{
         label?: string;
         value?: string;
@@ -35,12 +41,16 @@ interface Props {
   }>;
   sections: ResumeEntry[];
   primarySection?: ResumeEntry | null;
-  kicker: string;
+  kicker?: string;
   printHref: string;
 }
 
 const { hero, navItems, sections, primarySection, kicker, printHref } = Astro.props;
-const pageDescription = hero.data.summary ?? '简历内容';
+const heroSummaryText =
+  typeof hero.data.summary === 'string' ? joinResumeSummary(hero.data.summary) : undefined;
+const heroSummaryItems =
+  Array.isArray(hero.data.summary) ? normalizeResumeSummary(hero.data.summary) : [];
+const pageDescription = joinResumeSummary(hero.data.summary) ?? '简历内容';
 const primaryActionHref = primarySection ? `#${primarySection.data.sectionSlug}` : '#top';
 const primaryActionLabel = primarySection ? primarySection.data.title : '简历内容';
 const canonicalUrl = getCanonicalUrl(Astro.url, Astro.site);
@@ -62,10 +72,17 @@ const canonicalUrl = getCanonicalUrl(Astro.url, Astro.site);
     <main class="editorial-page" id="top">
       <header class="editorial-hero">
         <div class="editorial-hero-main">
-          <p class="editorial-hero-kicker">{kicker} / Resume</p>
+          {kicker && <p class="editorial-hero-kicker">{kicker} / Resume</p>}
           <h1 class="editorial-hero-title">{hero.data.title}</h1>
           {hero.data.subtitle && <p class="editorial-hero-role">{hero.data.subtitle}</p>}
-          {hero.data.summary && <p class="editorial-hero-summary">{hero.data.summary}</p>}
+          {heroSummaryText && <p class="editorial-hero-summary">{heroSummaryText}</p>}
+          {heroSummaryItems.length > 0 && (
+            <SummaryPills
+              items={heroSummaryItems}
+              className="editorial-hero-summary-pills"
+              itemClassName="editorial-hero-summary-pill"
+            />
+          )}
 
           <div class="editorial-hero-actions">
             <a class="editorial-hero-link editorial-hero-link-primary" href={primaryActionHref}>
@@ -116,13 +133,30 @@ const canonicalUrl = getCanonicalUrl(Astro.url, Astro.site);
 
         <div class="editorial-content">
           {
-            sections.map((section) => (
-              <article id={section.data.sectionSlug} class={`editorial-section editorial-section-${section.data.sectionSlug}`}>
+            sections.map((section) => {
+              const sectionSummaryText =
+                typeof section.data.summary === 'string'
+                  ? joinResumeSummary(section.data.summary)
+                  : undefined;
+              const sectionSummaryItems =
+                Array.isArray(section.data.summary)
+                  ? normalizeResumeSummary(section.data.summary)
+                  : [];
+
+              return (
+                <article id={section.data.sectionSlug} class={`editorial-section editorial-section-${section.data.sectionSlug}`}>
                 <header class="editorial-section-header">
                   <p class="editorial-section-kicker">{section.data.sectionSlug}</p>
                   <h2 class="editorial-section-title">{section.data.title}</h2>
                   {section.data.subtitle && <p class="editorial-section-subtitle">{section.data.subtitle}</p>}
-                  {section.data.summary && <p class="editorial-section-summary">{section.data.summary}</p>}
+                  {sectionSummaryText && <p class="editorial-section-summary">{sectionSummaryText}</p>}
+                  {sectionSummaryItems.length > 0 && (
+                    <SummaryPills
+                      items={sectionSummaryItems}
+                      className="editorial-section-summary-pills"
+                      itemClassName="editorial-section-summary-pill"
+                    />
+                  )}
                 </header>
 
                 <div class="editorial-section-body">
@@ -134,8 +168,9 @@ const canonicalUrl = getCanonicalUrl(Astro.url, Astro.site);
                     )
                   }
                 </div>
-              </article>
-            ))
+                </article>
+              );
+            })
           }
         </div>
       </section>

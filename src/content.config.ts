@@ -3,6 +3,39 @@ import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 import { resumeStyleIds } from './lib/resume-style-catalog';
 
+const resumeSummarySchema = z.preprocess((value) => {
+  if (value == null) {
+    return undefined;
+  }
+
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    return trimmed.length > 0 ? trimmed : undefined;
+  }
+
+  if (Array.isArray(value)) {
+    return value
+      .filter((item): item is string => typeof item === 'string')
+      .map((item) => item.trim())
+      .filter((item) => item.length > 0);
+  }
+
+  return value;
+}, z.union([z.string(), z.array(z.string())]).optional());
+
+const resumeKickerSchema = z.preprocess((value) => {
+  if (value == null) {
+    return undefined;
+  }
+
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    return trimmed.length > 0 ? trimmed : undefined;
+  }
+
+  return value;
+}, z.string().optional());
+
 const resume = defineCollection({
   loader: glob({
     base: './src/content/resumes',
@@ -12,7 +45,7 @@ const resume = defineCollection({
     z.object({
       kind: z.literal('meta'),
       label: z.string(),
-      kicker: z.string(),
+      kicker: resumeKickerSchema,
       summary: z.string(),
       listed: z.boolean().default(true),
       isDefault: z.boolean().default(false),
@@ -24,7 +57,7 @@ const resume = defineCollection({
     z.object({
       title: z.string(),
       subtitle: z.string().optional(),
-      summary: z.string().optional(),
+      summary: resumeSummarySchema,
       sectionSlug: z.string(),
       contacts: z
         .array(
@@ -42,7 +75,7 @@ const resume = defineCollection({
     z.object({
       title: z.string(),
       subtitle: z.string().optional(),
-      summary: z.string().optional(),
+      summary: resumeSummarySchema,
       sectionSlug: z.string(),
       kind: z.literal('section'),
       hidden: z.boolean().default(false),

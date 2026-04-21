@@ -1,0 +1,21 @@
+---
+interface Props {
+  items: string[];
+  className?: string;
+  itemClassName?: string;
+}
+
+const { items, className, itemClassName } = Astro.props;
+---
+
+{
+  items.length > 0 && (
+    <div class:list={['summary-pills', className]}>
+      {
+        items.map((item) => (
+          <span class:list={['summary-pill', itemClassName]}>{item}</span>
+        ))
+      }
+    </div>
+  )
+}

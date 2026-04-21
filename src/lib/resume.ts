@@ -1,5 +1,6 @@
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import type { ResumeId } from './resume-catalog';
+import type { ResumeSummary } from './resume-summary';
 import type { ResumeStyleId } from './resume-style-catalog';
 
 type ResumeEntry = CollectionEntry<'resume'>;
@@ -8,7 +9,7 @@ type ResumeMetaEntry = ResumeEntry & {
     hiddenSectionSlugs: string[];
     isDefault: boolean;
     isMaster: boolean;
-    kicker: string;
+    kicker?: string;
     kind: 'meta';
     label: string;
     listed: boolean;
@@ -23,6 +24,7 @@ type ResumeHeroEntry = ResumeEntry & {
     layout: 'full' | 'compact';
     order: number;
     sectionSlug: string;
+    summary?: ResumeSummary;
     title: string;
   };
 };
@@ -33,6 +35,7 @@ type ResumeSectionEntry = ResumeEntry & {
     layout: 'full' | 'compact';
     order: number;
     sectionSlug: string;
+    summary?: ResumeSummary;
     title: string;
   };
 };

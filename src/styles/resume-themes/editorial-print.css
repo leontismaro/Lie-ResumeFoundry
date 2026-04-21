@@ -59,8 +59,28 @@
 
 .editorial-print-summary {
   margin: 3mm 0 0;
-  color: var(--editorial-muted);
+  color: inherit;
   font-size: 11pt;
+  line-height: 1.3;
+}
+
+.editorial-print-summary-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2mm 1.8mm;
+  margin-top: 1.8mm;
+}
+
+.editorial-print-summary-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--editorial-accent);
+  font-size: 9pt;
+  line-height: 1.2;
+  white-space: normal;
 }
 
 .editorial-print-meta {
@@ -157,6 +177,8 @@ body.editorial-print-body .print-skill-items {
 body.editorial-print-body .print-section-summary {
   margin: 1.2mm 0 0;
   font-size: 10pt;
+  color: inherit;
+  line-height: 1.3;
 }
 
 body.editorial-print-body .print-section-body {
@@ -234,5 +256,28 @@ body.editorial-print-body .print-skill-items {
 @media screen and (max-width: 900px) {
   body.editorial-print-body .profile-meta-grid-print {
     grid-template-columns: 1fr;
+  }
+}
+
+@media print {
+  body.editorial-print-body {
+    background: #ffffff;
+  }
+
+  body.editorial-print-body .print-section {
+    break-inside: auto;
+    page-break-inside: auto;
+  }
+
+  body.editorial-print-body .editorial-print-page {
+    padding: 0;
+  }
+
+  body.editorial-print-body .editorial-print-sheet {
+    width: auto;
+    min-height: auto;
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
   }
 }

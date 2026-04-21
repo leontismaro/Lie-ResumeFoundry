@@ -36,7 +36,7 @@ const canonicalUrl = getCanonicalUrl(Astro.url, Astro.site);
           resumes.map((resume) => (
             <article class="resume-card">
               <div class="resume-card-header">
-                <p class="resume-card-kicker">{resume.kicker}</p>
+                {resume.kicker && <p class="resume-card-kicker">{resume.kicker}</p>}
                 <h2 class="resume-card-title">{resume.label}</h2>
                 <p class="resume-card-summary">{resume.summary}</p>
               </div>

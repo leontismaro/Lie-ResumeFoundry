@@ -8,7 +8,7 @@ export type ResumeId = string;
 
 export type ResumeDefinition = {
   id: ResumeId;
-  kicker: string;
+  kicker?: string;
   label: string;
   summary: string;
   listed: boolean;
@@ -23,7 +23,7 @@ type ResumeMetaEntry = ResumeEntry & {
   data: {
     isDefault: boolean;
     isMaster: boolean;
-    kicker: string;
+    kicker?: string;
     kind: 'meta';
     label: string;
     listed: boolean;

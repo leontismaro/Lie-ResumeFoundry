@@ -2,6 +2,7 @@
 import PrintSection from '../../PrintSection.astro';
 import PrintSkillsSection from '../../PrintSkillsSection.astro';
 import ProfileMetaGrid from '../../ProfileMetaGrid.astro';
+import { joinResumeSummary, type ResumeSummary } from '../../../lib/resume-summary';
 import { parseResumeSkillGroups } from '../../../lib/resume-skill-groups';
 import '../../../styles/resume-themes/editorial-print.css';
 
@@ -9,7 +10,7 @@ interface SectionEntry {
   body?: string;
   data: {
     title: string;
-    summary?: string;
+    summary?: ResumeSummary;
     sectionSlug: string;
   };
   Content: any;
@@ -20,7 +21,7 @@ interface Props {
     data: {
       title: string;
       subtitle?: string;
-      summary?: string;
+      summary?: ResumeSummary;
       contacts?: Array<{
         label?: string;
         value?: string;
@@ -29,11 +30,12 @@ interface Props {
     };
   };
   sections: SectionEntry[];
-  kicker: string;
+  kicker?: string;
   pageTitle: string;
 }
 
 const { hero, sections, kicker, pageTitle } = Astro.props;
+const heroSummaryText = joinResumeSummary(hero.data.summary, ' · ');
 ---
 
 <!doctype html>
@@ -48,10 +50,10 @@ const { hero, sections, kicker, pageTitle } = Astro.props;
     <main class="editorial-print-page">
       <section class="editorial-print-sheet">
         <header class="editorial-print-hero">
-          <p class="editorial-print-kicker">{kicker}</p>
+          {kicker && <p class="editorial-print-kicker">{kicker}</p>}
           <h1 class="editorial-print-title">{hero.data.title}</h1>
           {hero.data.subtitle && <p class="editorial-print-role">{hero.data.subtitle}</p>}
-          {hero.data.summary && <p class="editorial-print-summary">{hero.data.summary}</p>}
+          {heroSummaryText && <p class="editorial-print-summary">{heroSummaryText}</p>}
 
           <div class="editorial-print-meta">
             <ProfileMetaGrid

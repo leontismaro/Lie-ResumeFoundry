@@ -1,9 +1,16 @@
 ---
+import SummaryPills from './SummaryPills.astro';
+import {
+  joinResumeSummary,
+  normalizeResumeSummary,
+  type ResumeSummary,
+} from '../lib/resume-summary';
+
 interface Props {
   id: string;
   title: string;
   subtitle?: string;
-  summary?: string;
+  summary?: ResumeSummary;
   slug: string;
   layout?: 'full' | 'compact';
   tone?: 'primary' | 'secondary';
@@ -18,6 +25,8 @@ const {
   layout = 'compact',
   tone = 'secondary',
 } = Astro.props;
+const summaryText = typeof summary === 'string' ? joinResumeSummary(summary) : undefined;
+const summaryItems = Array.isArray(summary) ? normalizeResumeSummary(summary) : [];
 ---
 
 <section
@@ -33,7 +42,14 @@ const {
     <p class="resume-section-kicker">{tone === 'primary' ? 'Highlights' : 'Details'}</p>
     <h2 class="resume-section-title">{title}</h2>
     {subtitle && <p class="resume-section-subtitle">{subtitle}</p>}
-    {summary && <p class="resume-section-summary">{summary}</p>}
+    {summaryText && <p class="resume-section-summary">{summaryText}</p>}
+    {summaryItems.length > 0 && (
+      <SummaryPills
+        items={summaryItems}
+        className="resume-section-summary-pills"
+        itemClassName="resume-section-summary-pill"
+      />
+    )}
   </header>
 
   <div class="resume-section-body">

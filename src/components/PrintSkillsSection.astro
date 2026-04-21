@@ -1,4 +1,6 @@
 ---
+import { joinResumeSummary, type ResumeSummary } from '../lib/resume-summary';
+
 interface SkillGroup {
   name: string;
   items: string[];
@@ -6,17 +8,18 @@ interface SkillGroup {
 
 interface Props {
   title: string;
-  summary?: string;
+  summary?: ResumeSummary;
   groups: SkillGroup[];
 }
 
 const { title, summary, groups } = Astro.props;
+const summaryText = joinResumeSummary(summary, ' · ');
 ---
 
 <section class:list={['print-section', 'print-section-skills']}>
   <header class="print-section-header">
     <h2 class="print-section-title">{title}</h2>
-    {summary && <p class="print-section-summary">{summary}</p>}
+    {summaryText && <p class="print-section-summary">{summaryText}</p>}
   </header>
 
   <div class="print-section-body">

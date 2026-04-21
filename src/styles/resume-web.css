@@ -209,10 +209,46 @@ html {
 }
 
 .resume-hero-summary {
-  margin: 1.15rem 0 0;
-  max-width: 34rem;
-  color: var(--muted);
+  margin: 0.9rem 0 0;
+  max-width: 40rem;
+  color: inherit;
   font-size: 1rem;
+  line-height: 1.38;
+}
+
+.summary-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.summary-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.82rem;
+  padding: 0.24rem 0.62rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--ink);
+  font-size: 0.8rem;
+  font-weight: 560;
+  line-height: 1.1;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.resume-hero-summary-pills {
+  margin-top: 0.88rem;
+  max-width: 40rem;
+}
+
+.resume-hero-summary-pill {
+  padding-inline: 0.68rem;
+  border-color: rgba(47, 143, 190, 0.16);
+  background: rgba(47, 143, 190, 0.08);
+  color: #225f81;
+  box-shadow: 0 4px 12px rgba(47, 143, 190, 0.06);
 }
 
 .resume-hero-actions {
@@ -327,8 +363,20 @@ html {
 }
 
 .resume-section-summary {
-  margin: 0.72rem 0 0;
-  color: var(--muted);
+  margin: 0.56rem 0 0;
+  color: inherit;
+  line-height: 1.38;
+}
+
+.resume-section-summary-pills {
+  margin-top: 0.62rem;
+}
+
+.resume-section-summary-pill {
+  border-color: rgba(31, 88, 116, 0.1);
+  background: rgba(255, 255, 255, 0.58);
+  color: #476472;
+  font-size: 0.76rem;
 }
 
 .resume-section-body h3 {

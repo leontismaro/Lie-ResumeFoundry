@@ -63,8 +63,46 @@
 .print-hero-summary {
   margin: 3mm 0 0;
   max-width: 34em;
-  color: var(--muted);
+  color: inherit;
   font-size: 11.4pt;
+  line-height: 1.3;
+}
+
+.print-hero-summary-pills,
+.print-section-summary-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2mm 1.8mm;
+}
+
+.print-hero-summary-pills {
+  margin-top: 1.8mm;
+}
+
+.print-section-summary-pills {
+  margin-top: 0.9mm;
+}
+
+.print-hero-summary-pill,
+.print-section-summary-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-size: 9pt;
+  line-height: 1.2;
+  white-space: normal;
+}
+
+.print-hero-summary-pill {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.print-section-summary-pill {
+  color: var(--muted);
+  font-weight: 600;
 }
 
 .print-flow {
@@ -150,7 +188,7 @@ body.glass-print-body .print-hero-role {
 }
 
 body.glass-print-body .print-hero-summary {
-  color: var(--muted);
+  color: inherit;
 }
 
 body.glass-print-body .profile-meta-grid-print {
@@ -229,6 +267,8 @@ body.glass-print-body .print-skill-items {
 body.glass-print-body .print-section-summary {
   margin: 1.2mm 0 0;
   font-size: 10.25pt;
+  color: inherit;
+  line-height: 1.3;
 }
 
 body.glass-print-body .print-section-body {
