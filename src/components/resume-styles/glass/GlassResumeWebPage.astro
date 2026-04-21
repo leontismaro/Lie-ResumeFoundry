@@ -2,6 +2,7 @@
 import ResumeNav from '../../ResumeNav.astro';
 import ResumeSection from '../../ResumeSection.astro';
 import ProfileMetaGrid from '../../ProfileMetaGrid.astro';
+import { getCanonicalUrl, withBase } from '../../../lib/site';
 import '../../../styles/resume-themes/glass-web.css';
 
 interface ResumeEntry {
@@ -45,6 +46,7 @@ const mainSections = sections.filter((section) => section.data.layout === 'full'
 const sideSections = sections.filter((section) => section.data.layout !== 'full');
 const primaryActionHref = primarySection ? `#${primarySection.data.sectionSlug}` : '#top';
 const primaryActionLabel = primarySection ? `查看${primarySection.data.title}` : '查看简历';
+const canonicalUrl = getCanonicalUrl(Astro.url, Astro.site);
 ---
 
 <!doctype html>
@@ -54,8 +56,9 @@ const primaryActionLabel = primarySection ? `查看${primarySection.data.title}`
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={pageDescription} />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" href="/favicon.ico" />
+    {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+    <link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
+    <link rel="icon" href={withBase('/favicon.ico')} />
     <title>{hero.data.title} | 简历</title>
   </head>
   <body class="glass-web-body">

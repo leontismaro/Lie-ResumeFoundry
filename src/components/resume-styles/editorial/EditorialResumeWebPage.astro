@@ -2,6 +2,7 @@
 import EditorialSkillsSection from './EditorialSkillsSection.astro';
 import ProfileMetaGrid from '../../ProfileMetaGrid.astro';
 import { parseResumeSkillGroups } from '../../../lib/resume-skill-groups';
+import { getCanonicalUrl, withBase } from '../../../lib/site';
 import '../../../styles/resume-themes/editorial-web.css';
 
 interface ResumeEntry {
@@ -42,6 +43,7 @@ const { hero, navItems, sections, primarySection, kicker, printHref } = Astro.pr
 const pageDescription = hero.data.summary ?? '简历内容';
 const primaryActionHref = primarySection ? `#${primarySection.data.sectionSlug}` : '#top';
 const primaryActionLabel = primarySection ? primarySection.data.title : '简历内容';
+const canonicalUrl = getCanonicalUrl(Astro.url, Astro.site);
 ---
 
 <!doctype html>
@@ -51,8 +53,9 @@ const primaryActionLabel = primarySection ? primarySection.data.title : '简历�
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={pageDescription} />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" href="/favicon.ico" />
+    {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+    <link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
+    <link rel="icon" href={withBase('/favicon.ico')} />
     <title>{hero.data.title} | 简历</title>
   </head>
   <body class="editorial-page-body">
@@ -91,7 +94,7 @@ const primaryActionLabel = primarySection ? primarySection.data.title : '简历�
             <div class="editorial-rail-avatar-shell">
               <img
                 class="editorial-rail-avatar"
-                src="/avatar.jpg"
+                src={withBase('/avatar.jpg')}
                 alt="个人头像"
                 width="160"
                 height="160"

@@ -1,5 +1,6 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import type { ResumeStyleId } from './resume-style-catalog';
+import { withBase } from './site';
 
 const resumeContentPathPrefix = 'src/content/resumes/';
 
@@ -106,8 +107,8 @@ export function getResumePath(
   const { preferMasterRoot = false, print = false, isMaster = false } = options;
 
   if (preferMasterRoot && isMaster) {
-    return print ? '/print' : '/';
+    return withBase(print ? '/print' : '/');
   }
 
-  return print ? `/resume/${resumeId}/print` : `/resume/${resumeId}`;
+  return withBase(print ? `/resume/${resumeId}/print` : `/resume/${resumeId}`);
 }

@@ -1,8 +1,10 @@
 ---
 import { getListedResumeCatalog, getResumePath } from '../lib/resume-catalog';
+import { getCanonicalUrl, withBase } from '../lib/site';
 import '../styles/resume-hub.css';
 
 const resumes = await getListedResumeCatalog();
+const canonicalUrl = getCanonicalUrl(Astro.url, Astro.site);
 ---
 
 <!doctype html>
@@ -12,8 +14,9 @@ const resumes = await getListedResumeCatalog();
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content="查看当前站点提供的全部简历版本。" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" href="/favicon.ico" />
+    {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+    <link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
+    <link rel="icon" href={withBase('/favicon.ico')} />
     <title>简历列表</title>
   </head>
   <body>

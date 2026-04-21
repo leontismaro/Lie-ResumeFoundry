@@ -1,4 +1,6 @@
 ---
+import { withBase } from '../lib/site';
+
 const pageTitle = '验证访问权限';
 ---
 
@@ -151,7 +153,7 @@ const pageTitle = '验证访问权限';
         <div class="notice" data-kind="error" id="errorNotice"></div>
         <div class="notice" data-kind="success" id="successNotice"></div>
 
-        <form action="/auth/qr" method="post" id="unlockForm">
+        <form action={withBase('/auth/qr')} method="post" id="unlockForm">
           <input type="hidden" name="next" id="nextField" value="/" />
 
           <div class="stack">
@@ -173,7 +175,7 @@ const pageTitle = '验证访问权限';
 
           <div class="actions">
             <button type="submit">验证并进入</button>
-            <a class="link" href="/auth/logout">清除当前会话</a>
+            <a class="link" href={withBase('/auth/logout')}>清除当前会话</a>
           </div>
         </form>
       </section>
