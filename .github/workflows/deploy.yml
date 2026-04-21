@@ -19,8 +19,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      SITE_URL: https://leontismaro.github.io
-      SITE_BASE: /Lie-ResumeFoundry
+      REPO_SITE_URL: ${{ vars.SITE_URL }}
+      REPO_SITE_BASE: ${{ vars.SITE_BASE }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -30,6 +30,24 @@ jobs:
         with:
           node-version: 22.12.0
           cache: npm
+
+      - name: Compute site config
+        run: |
+          owner="$GITHUB_REPOSITORY_OWNER"
+          repo="${GITHUB_REPOSITORY#*/}"
+
+          site_url="${REPO_SITE_URL:-https://${owner}.github.io}"
+
+          if [ -n "$REPO_SITE_BASE" ]; then
+            site_base="$REPO_SITE_BASE"
+          elif [ "$repo" = "${owner}.github.io" ]; then
+            site_base="/"
+          else
+            site_base="/$repo"
+          fi
+
+          echo "SITE_URL=$site_url" >> "$GITHUB_ENV"
+          echo "SITE_BASE=$site_base" >> "$GITHUB_ENV"
 
       - name: Install dependencies
         run: npm ci
