@@ -12,6 +12,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
+    "hash-admin-password": "node scripts/hash-admin-password.mjs",
     "issue-qr": "node scripts/issue-qr.mjs",
     "create-resume": "node scripts/create-resume.mjs"
   },

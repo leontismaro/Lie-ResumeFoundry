@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 
+/** @param {string | undefined} basePath */
 function normalizeBasePath(basePath) {
   if (!basePath || basePath === '/') {
     return '/';

@@ -5,7 +5,7 @@
 - 简历页面受 session 控制访问
 - `/auth/qr` 与 `/auth/logout` 正常工作
 - D1 可用于短码、session 与限流状态存储
-- 后台控制台由 Cloudflare Access 保护
+- 后台控制台由后台密码或 Cloudflare Access 保护
 
 ## 部署模型
 
@@ -15,7 +15,8 @@
 - Cloudflare Pages 托管静态页面
 - Cloudflare Pages Functions 负责访问拦截、短码校验与后台接口
 - Cloudflare D1 保存 `invite_tokens`、`sessions` 与 `auth_rate_limits`
-- Cloudflare Access 负责后台入口认证
+- 后台默认使用本项目中间件与独立后台密码 cookie
+- Cloudflare Access 可作为后台入口认证增强
 
 因此，部署时必须同时保留：
 
@@ -93,8 +94,10 @@ npx wrangler d1 execute "lies-resumefoundry-auth" --remote --file "database/sche
   "AUTH_QR_RATE_LIMIT_WINDOW_SECONDS": "600",
   "AUTH_PUBLIC_PATHS": "/unlock,/auth/qr,/auth/logout,/_astro/*,/favicon.ico,/favicon.svg",
   "ADMIN_BASE_PATH": "/internal-console/8d98fa5f0df14cabae1ddf37cb6ef4f5",
-  "ADMIN_ACCESS_DOMAIN": "https://<your-team>.cloudflareaccess.com",
-  "ADMIN_ACCESS_AUD": "<access-audience>"
+  "ADMIN_AUTH_MODE": "local",
+  "ADMIN_SESSION_TTL_SECONDS": "28800",
+  "ADMIN_LOGIN_RATE_LIMIT_MAX_ATTEMPTS": "5",
+  "ADMIN_LOGIN_RATE_LIMIT_WINDOW_SECONDS": "600"
 }
 ```
 
@@ -164,7 +167,67 @@ resume_session
 /internal-console/8d98fa5f0df14cabae1ddf37cb6ef4f5
 ```
 
-该路径用于降低被枚举概率，真正的访问控制由 Cloudflare Access 承担。
+该路径用于降低被枚举概率，真正的访问控制由后台认证承担。
+
+### `ADMIN_AUTH_MODE`
+
+后台认证模式。默认推荐：
+
+```text
+local
+```
+
+可选值：
+
+- `local`
+- `access`
+- `access_with_local_fallback`
+
+### `ADMIN_PASSWORD_HASH`
+
+本地后台密码的 PBKDF2 hash。启用 `local` 或 `access_with_local_fallback` 时必须配置。
+
+生成方式：
+
+```sh
+npm run hash-admin-password
+```
+
+建议通过 Cloudflare Pages Secret 配置，不写入仓库。
+
+### `ADMIN_SESSION_TTL_SECONDS`
+
+后台登录 session 生命周期，单位为秒。默认值为 8 小时：
+
+```text
+28800
+```
+
+### `ADMIN_SESSION_COOKIE_NAME`
+
+后台 session cookie 名称。默认值为：
+
+```text
+resume_admin_session
+```
+
+该 cookie 独立于简历访问 cookie。
+
+### `ADMIN_LOGIN_RATE_LIMIT_MAX_ATTEMPTS`
+
+后台密码登录在统计窗口内允许的最大失败次数。默认值：
+
+```text
+5
+```
+
+### `ADMIN_LOGIN_RATE_LIMIT_WINDOW_SECONDS`
+
+后台密码登录失败统计窗口与临时阻断时长，单位为秒。默认值：
+
+```text
+600
+```
 
 ### `ADMIN_ACCESS_DOMAIN`
 
@@ -182,13 +245,31 @@ Cloudflare Access 应用的 Audience 值。后台插件使用该值校验访问 
 
 可选项。仅在明确需要跨子域共享 session cookie 时设置。
 
-### `ADMIN_BYPASS_ACCESS`
+## 第四步：配置后台认证
 
-仅用于本地调试。生产环境不应启用。
+默认推荐使用本地后台密码：
 
-## 第四步：配置 Cloudflare Access
+```text
+ADMIN_AUTH_MODE=local
+```
 
-后台路径必须由 Cloudflare Access 单独保护。建议创建一个 Self-hosted Application，仅匹配后台路径。
+并配置：
+
+```text
+ADMIN_PASSWORD_HASH=<hash-admin-password 输出值>
+```
+
+登录成功后会写入独立后台 cookie：
+
+```text
+resume_admin_session
+```
+
+该 cookie 的路径限定为 `ADMIN_BASE_PATH`。
+
+### 可选：配置 Cloudflare Access
+
+如需使用 Cloudflare Access，创建一个 Self-hosted Application，仅匹配后台路径。
 
 建议的保护范围：
 
@@ -209,6 +290,14 @@ Access 负责：
 
 - 后台写接口同源校验
 - 后台响应头安全收口
+
+如需 Access 配置异常时仍可进入本地密码登录，可设置：
+
+```text
+ADMIN_AUTH_MODE=access_with_local_fallback
+```
+
+有 Access JWT 但校验失败时不会降级。
 
 ## 第五步：检查 `wrangler.jsonc`
 
@@ -290,7 +379,7 @@ npx wrangler pages deploy "dist"
 - `/favicon.ico`
 - `/favicon.svg`
 
-### 3. 后台路径应由 Access 拦截
+### 3. 后台路径应受认证保护
 
 访问：
 
@@ -300,7 +389,7 @@ https://<your-domain><ADMIN_BASE_PATH>
 
 预期：
 
-- 未登录时进入 Cloudflare Access 校验
+- 默认模式下进入后台密码登录
 - 通过后进入后台控制台
 
 ### 4. 后台短码管理应可用
@@ -322,9 +411,19 @@ https://<your-domain><ADMIN_BASE_PATH>
 
 ## 常见问题
 
+### 后台返回 500，提示缺少 `ADMIN_PASSWORD_HASH`
+
+说明启用了本地后台密码，但未配置密码 hash。执行：
+
+```sh
+npm run hash-admin-password
+```
+
+将输出值配置到 `ADMIN_PASSWORD_HASH`。
+
 ### 后台返回 500，提示缺少 `ADMIN_ACCESS_DOMAIN` 或 `ADMIN_ACCESS_AUD`
 
-说明后台 Access 变量未配置完整。请补齐：
+说明启用了 `ADMIN_AUTH_MODE=access`，但 Access 变量未配置完整。请补齐：
 
 - `ADMIN_ACCESS_DOMAIN`
 - `ADMIN_ACCESS_AUD`

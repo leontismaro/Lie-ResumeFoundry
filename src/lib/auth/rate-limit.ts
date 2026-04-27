@@ -10,15 +10,18 @@ interface RateLimitRow {
   window_started_at: number;
 }
 
-export interface QrAuthRateLimitConfig {
+export interface RateLimitConfig {
   maxAttempts: number;
   windowSeconds: number;
 }
 
-export interface QrAuthRateLimitState {
+export interface RateLimitState {
   blocked: boolean;
   retryAfterSeconds: number;
 }
+
+export type QrAuthRateLimitConfig = RateLimitConfig;
+export type QrAuthRateLimitState = RateLimitState;
 
 function normalizeSubject(input: string | null | undefined) {
   const value = input?.trim();
@@ -42,7 +45,7 @@ export function getClientAddress(request: Request) {
   );
 }
 
-async function readQrAuthRateLimitRow(db: D1DatabaseLike, subject: string) {
+async function readRateLimitRow(db: D1DatabaseLike, scope: string, subject: string) {
   return db
     .prepare(
       `
@@ -57,16 +60,17 @@ async function readQrAuthRateLimitRow(db: D1DatabaseLike, subject: string) {
           and subject = ?
       `,
     )
-    .bind(QR_AUTH_RATE_LIMIT_SCOPE, subject)
+    .bind(scope, subject)
     .first<RateLimitRow>();
 }
 
-export async function readQrAuthRateLimitState(
+export async function readRateLimitState(
   db: D1DatabaseLike,
+  scope: string,
   subject: string,
   now: number,
-): Promise<QrAuthRateLimitState> {
-  const row = await readQrAuthRateLimitRow(db, normalizeSubject(subject));
+): Promise<RateLimitState> {
+  const row = await readRateLimitRow(db, scope, normalizeSubject(subject));
 
   if (!row || !row.blocked_until || row.blocked_until <= now) {
     return {
@@ -81,7 +85,7 @@ export async function readQrAuthRateLimitState(
   };
 }
 
-export async function clearQrAuthRateLimit(db: D1DatabaseLike, subject: string) {
+export async function clearRateLimit(db: D1DatabaseLike, scope: string, subject: string) {
   await db
     .prepare(
       `
@@ -90,18 +94,19 @@ export async function clearQrAuthRateLimit(db: D1DatabaseLike, subject: string) 
           and subject = ?
       `,
     )
-    .bind(QR_AUTH_RATE_LIMIT_SCOPE, normalizeSubject(subject))
+    .bind(scope, normalizeSubject(subject))
     .run();
 }
 
-export async function recordFailedQrAuthAttempt(
+export async function recordFailedRateLimitAttempt(
   db: D1DatabaseLike,
+  scope: string,
   subject: string,
   now: number,
-  config: QrAuthRateLimitConfig,
-): Promise<QrAuthRateLimitState> {
+  config: RateLimitConfig,
+): Promise<RateLimitState> {
   const normalizedSubject = normalizeSubject(subject);
-  const row = await readQrAuthRateLimitRow(db, normalizedSubject);
+  const row = await readRateLimitRow(db, scope, normalizedSubject);
   const shouldResetWindow =
     !row ||
     now - row.window_started_at >= config.windowSeconds ||
@@ -129,7 +134,7 @@ export async function recordFailedQrAuthAttempt(
             updated_at = excluded.updated_at
         `,
       )
-      .bind(QR_AUTH_RATE_LIMIT_SCOPE, normalizedSubject, now, blockedUntil, now)
+      .bind(scope, normalizedSubject, now, blockedUntil, now)
       .run();
 
     return {
@@ -160,11 +165,32 @@ export async function recordFailedQrAuthAttempt(
           and subject = ?
       `,
     )
-    .bind(nextAttempts, blockedUntil, now, QR_AUTH_RATE_LIMIT_SCOPE, normalizedSubject)
+    .bind(nextAttempts, blockedUntil, now, scope, normalizedSubject)
     .run();
 
   return {
     blocked: blockedUntil !== null,
     retryAfterSeconds: blockedUntil ? config.windowSeconds : 0,
   };
+}
+
+export async function readQrAuthRateLimitState(
+  db: D1DatabaseLike,
+  subject: string,
+  now: number,
+): Promise<QrAuthRateLimitState> {
+  return readRateLimitState(db, QR_AUTH_RATE_LIMIT_SCOPE, subject, now);
+}
+
+export async function clearQrAuthRateLimit(db: D1DatabaseLike, subject: string) {
+  await clearRateLimit(db, QR_AUTH_RATE_LIMIT_SCOPE, subject);
+}
+
+export async function recordFailedQrAuthAttempt(
+  db: D1DatabaseLike,
+  subject: string,
+  now: number,
+  config: QrAuthRateLimitConfig,
+): Promise<QrAuthRateLimitState> {
+  return recordFailedRateLimitAttempt(db, QR_AUTH_RATE_LIMIT_SCOPE, subject, now, config);
 }

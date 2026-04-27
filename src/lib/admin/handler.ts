@@ -1,7 +1,7 @@
 import { revokeSessionsByInviteId } from '../auth/storage';
 import { adminRouteOptions } from '../../generated/admin-route-options';
 import { getAdminConfig, getAdminSubPath } from './config';
-import { requireAdminAccess } from './access';
+import { handleAdminAuthRequest, requireAdminAccess } from './access';
 import {
   addAdminInviteUses,
   createAdminInvite,
@@ -117,6 +117,18 @@ export async function handleAdminRequest(context: PagesContext) {
 
   if (!subPath) {
     return null;
+  }
+
+  const authResponse = await handleAdminAuthRequest(
+    {
+      env: context.env,
+      request: context.request,
+    },
+    config,
+    subPath,
+  );
+  if (authResponse) {
+    return authResponse;
   }
 
   const access = await requireAdminAccess({

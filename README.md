@@ -11,7 +11,7 @@
 - 在同一仓库中维护多份简历版本
 - 为不同简历版本指定不同渲染样式
 - 通过二维码与邀请链接控制访问入口
-- 使用 Pages Functions、D1 与 Cloudflare Access 形成完整的发布与管理链路
+- 使用 Pages Functions、D1 与后台认证形成完整的发布与管理链路
 
 ## 项目提供的功能
 
@@ -85,7 +85,7 @@ src/content/resumes/<resume-id>/
 - `fixed_ttl`
 - `cap_to_invite_expiry`
 
-项目同时提供受 Cloudflare Access 保护的后台 token 管理控制台，用于：
+项目同时提供后台 token 管理控制台。默认由后台密码保护，也可接入 Cloudflare Access，用于：
 
 - 创建 token
 - 禁用 token
@@ -103,7 +103,7 @@ src/content/resumes/<resume-id>/
 - Cloudflare Pages
 - Pages Functions
 - D1
-- Cloudflare Access
+- 后台密码认证
 
 用于实现：
 
@@ -132,7 +132,7 @@ src/content/resumes/<resume-id>/
 - 受保护页面统一经由 session 校验
 - `/auth/qr` 具备失败尝试限流
 - 后台写接口执行同源校验
-- 后台入口由 Cloudflare Access 保护
+- 后台入口使用独立后台 cookie
 
 ## 适用场景
 
@@ -167,10 +167,16 @@ cp ".dev.vars.example" ".dev.vars"
 `.dev.vars.example` 中包含本地运行后台控制台所需的默认示例配置。默认示例启用了：
 
 ```text
-ADMIN_BYPASS_ACCESS=true
+ADMIN_AUTH_MODE=local
 ```
 
-该变量仅用于本地调试后台，生产环境不应启用。
+本地示例密码为：
+
+```text
+local-admin-pass
+```
+
+生产环境必须替换 `ADMIN_PASSWORD_HASH`。
 
 ### 3. 仅预览前端页面
 

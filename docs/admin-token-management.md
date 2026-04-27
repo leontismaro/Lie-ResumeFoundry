@@ -31,13 +31,14 @@
    /internal-console/8d98fa5f0df14cabae1ddf37cb6ef4f5
    ```
 
-2. Cloudflare Access  
-   真正的访问控制边界。即使后台路径被发现，仍需通过 Access 认证。
+2. 后台认证
+   默认使用本项目中间件与后台密码，也可切换为 Cloudflare Access。
 
 说明：
 
 - 隐藏路径用于降低被枚举概率
-- 真正的访问控制边界由 Cloudflare Access 提供
+- 后台密码使用独立 cookie，不复用简历访问 session
+- Cloudflare Access 可作为可选增强
 
 ## 运行时依赖
 
@@ -47,7 +48,7 @@
 - `src/lib/admin/*`
 - D1 `invite_tokens`
 - D1 `sessions`
-- Cloudflare Access
+- D1 `auth_rate_limits`
 
 后台写接口额外包含：
 
@@ -67,16 +68,16 @@ cp ".dev.vars.example" ".dev.vars"
 本地示例默认启用：
 
 ```text
-ADMIN_BYPASS_ACCESS=true
+ADMIN_AUTH_MODE=local
 ```
 
-这表示本地 `wrangler pages dev` 环境下不校验真实 Access 身份，而是使用：
+这表示本地 `wrangler pages dev` 环境下使用后台密码登录。示例密码为：
 
 ```text
-ADMIN_BYPASS_USER_EMAIL
+local-admin-pass
 ```
 
-作为后台显示的管理员身份。
+生产环境必须替换 `ADMIN_PASSWORD_HASH`。
 
 ### 2. 初始化本地数据库
 
@@ -110,13 +111,36 @@ http://127.0.0.1:8788/internal-console/8d98fa5f0df14cabae1ddf37cb6ef4f5
 生产环境必须配置：
 
 - `ADMIN_BASE_PATH`
+- `ADMIN_AUTH_MODE`
+- `ADMIN_PASSWORD_HASH`
+
+默认推荐：
+
+```text
+ADMIN_AUTH_MODE=local
+```
+
+如需使用 Cloudflare Access，可改为：
+
+```text
+ADMIN_AUTH_MODE=access
+```
+
+并配置：
+
 - `ADMIN_ACCESS_DOMAIN`
 - `ADMIN_ACCESS_AUD`
 
-并确保：
+如需 Access 配置异常时回退本地密码，可使用：
 
-- Cloudflare Access 保护 `<ADMIN_BASE_PATH>` 与 `<ADMIN_BASE_PATH>/*`
-- `ADMIN_BYPASS_ACCESS` 未启用
+```text
+ADMIN_AUTH_MODE=access_with_local_fallback
+```
+
+注意：
+
+- 本地密码登录使用 `resume_admin_session`，不复用 `resume_session`
+- 不再支持运行时绕过后台认证
 
 ## 目标路径来源
 
@@ -234,9 +258,23 @@ src/generated/admin-route-options.ts
 
 ## 常见问题
 
+### 打开后台提示缺少 `ADMIN_PASSWORD_HASH`
+
+说明本地后台密码未配置。执行：
+
+```sh
+npm run hash-admin-password
+```
+
+将输出值配置到：
+
+```text
+ADMIN_PASSWORD_HASH
+```
+
 ### 打开后台提示缺少 `ADMIN_ACCESS_DOMAIN` 或 `ADMIN_ACCESS_AUD`
 
-说明生产配置不完整。请检查：
+说明当前启用了 `ADMIN_AUTH_MODE=access`。请检查：
 
 - `ADMIN_ACCESS_DOMAIN`
 - `ADMIN_ACCESS_AUD`

@@ -30,15 +30,27 @@ AUTH_PUBLIC_PATHS=/unlock,/auth/qr,/auth/logout,/_astro/*,/favicon.ico,/favicon.
 # 后台入口目录。建议上线前替换成你自己的长随机路径。
 ADMIN_BASE_PATH=/internal-console/8d98fa5f0df14cabae1ddf37cb6ef4f5
 
+# 后台鉴权模式：
+# local：使用本项目中间件与后台密码
+# access：仅使用 Cloudflare Access
+# access_with_local_fallback：Access JWT 优先，无 JWT 时回退后台密码
+ADMIN_AUTH_MODE=local
+
+# 本地示例密码为 local-admin-pass。生产环境必须替换。
+ADMIN_PASSWORD_HASH="pbkdf2-sha256$310000$I5fTp2hu1k1yohDupDI38C6At8coqZ53$tt8DkcIyFEfvNSoB6fZarhJobsIi6fmGyPLhydxaXwM"
+
+# 后台管理员显示名称。
+ADMIN_USER_EMAIL=local-admin@example.com
+
+# 后台登录 session 有效期，单位秒。28800 秒 = 8 小时。
+ADMIN_SESSION_TTL_SECONDS=28800
+
+# 后台登录失败限流。
+ADMIN_LOGIN_RATE_LIMIT_MAX_ATTEMPTS=5
+ADMIN_LOGIN_RATE_LIMIT_WINDOW_SECONDS=600
+
 # Cloudflare Access 应用域名，例如 https://example.cloudflareaccess.com
 ADMIN_ACCESS_DOMAIN=https://replace-with-your-team.cloudflareaccess.com
 
 # Cloudflare Access 应用对应的 Audience（aud）
 ADMIN_ACCESS_AUD=replace-with-your-access-audience
-
-# 本地调试后台时可临时关闭 Access 校验。
-# 线上不要开启。
-ADMIN_BYPASS_ACCESS=true
-
-# 本地绕过 Access 时，后台界面展示的管理员邮箱。
-ADMIN_BYPASS_USER_EMAIL=local-admin@example.com

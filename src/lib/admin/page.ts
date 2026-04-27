@@ -15,6 +15,19 @@ export function renderAdminPage(config: AdminConfig, identity: AdminIdentity, ro
   const basePath = JSON.stringify(config.basePath);
   const serializedRouteOptions = JSON.stringify(routeOptions);
   const actorEmail = escapeHtml(identity.email);
+  const logoutFormMarkup =
+    identity.authMethod === 'local'
+      ? `<form action="${escapeHtml(config.basePath)}/logout" method="post">
+              <button class="ghost" type="submit">退出</button>
+            </form>`
+      : '';
+  const authLabel = escapeHtml(
+    config.authMode === 'access'
+      ? 'Cloudflare Access'
+      : config.authMode === 'access_with_local_fallback'
+        ? 'Access / 后台密码'
+        : '后台密码',
+  );
   const routeOptionsMarkup = routeOptions
     .map((option) => `<option value="${escapeHtml(option.value)}">${escapeHtml(option.label)}</option>`)
     .join('');
@@ -93,6 +106,13 @@ export function renderAdminPage(config: AdminConfig, identity: AdminIdentity, ro
 
       .muted {
         color: var(--muted);
+      }
+
+      .admin-session {
+        display: grid;
+        gap: 10px;
+        justify-items: end;
+        text-align: right;
       }
 
       .summary-grid, .workspace {
@@ -539,6 +559,11 @@ export function renderAdminPage(config: AdminConfig, identity: AdminIdentity, ro
           align-items: stretch;
         }
 
+        .admin-session {
+          justify-items: start;
+          text-align: left;
+        }
+
         .shell {
           width: min(100vw - 20px, 1460px);
         }
@@ -590,11 +615,14 @@ export function renderAdminPage(config: AdminConfig, identity: AdminIdentity, ro
       <section class="hero">
         <div class="hero-top">
           <div>
-            <p class="muted">Cloudflare Access Protected Console</p>
+            <p class="muted">${authLabel}</p>
             <h1>二维码 / 短码管理台</h1>
-            <p class="muted">当前后台路径已受 Cloudflare Access 保护。新短码生成后只会展示一次明文，请立即复制或下载二维码。</p>
+            <p class="muted">新短码只展示一次，请及时保存。</p>
           </div>
-          <div class="muted">当前管理员：${actorEmail}</div>
+          <div class="admin-session">
+            <div class="muted">当前管理员：${actorEmail}</div>
+            ${logoutFormMarkup}
+          </div>
         </div>
 
         <div class="summary-grid" id="summaryGrid">
