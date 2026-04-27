@@ -1,0 +1,50 @@
+---
+import { QR_TOKEN_MIN_LENGTH, QR_TOKEN_PATTERN_SOURCE } from '../lib/auth/qr-token';
+
+interface Props {
+  enabled?: boolean;
+  unlockPath: string;
+}
+
+const { enabled = false, unlockPath } = Astro.props;
+---
+
+{
+  enabled && (
+    <script
+      is:inline
+      data-token-length={QR_TOKEN_MIN_LENGTH}
+      data-token-pattern={QR_TOKEN_PATTERN_SOURCE}
+      data-unlock-path={unlockPath}
+    >
+      {`(() => {
+  const currentScript = document.currentScript;
+  const tokenLength = Number(currentScript?.dataset.tokenLength || 0);
+  const tokenPatternSource = currentScript?.dataset.tokenPattern;
+  const unlockPath = currentScript?.dataset.unlockPath || '/unlock';
+  const fragment = window.location.hash.replace(/^#/, '').trim();
+
+  if (!fragment || !tokenPatternSource) {
+    return;
+  }
+
+  const params = new URLSearchParams(fragment);
+  const fragmentToken = params.get('t') || params.get('token');
+  const token = fragmentToken || fragment;
+  const tokenPattern = new RegExp('^' + tokenPatternSource + '$');
+
+  if (!tokenPattern.test(token)) {
+    return;
+  }
+
+  if (!fragmentToken && token.length !== tokenLength) {
+    return;
+  }
+
+  const unlockUrl = new URL(unlockPath, window.location.origin);
+  unlockUrl.hash = token;
+  window.location.replace(unlockUrl.toString());
+})();`}
+    </script>
+  )
+}

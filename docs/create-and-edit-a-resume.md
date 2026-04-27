@@ -416,7 +416,7 @@ npm run dev
 说明：
 
 - 该命令会在启动前自动执行 `scripts/generate-admin-route-options.mjs`
-- 后台创建 token 时使用的目标路径下拉列表会同步刷新
+- 后台创建短码时使用的目标路径下拉列表会同步刷新
 - 当你新增简历、调整 `isMaster`、修改简历名称或排序后，重新执行一次 `npm run dev` 或 `npm run build`，即可让后台下拉项与内容目录保持一致
 
 访问：

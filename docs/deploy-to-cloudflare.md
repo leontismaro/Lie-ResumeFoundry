@@ -4,7 +4,7 @@
 
 - 简历页面受 session 控制访问
 - `/auth/qr` 与 `/auth/logout` 正常工作
-- D1 可用于 token、session 与限流状态存储
+- D1 可用于短码、session 与限流状态存储
 - 后台控制台由 Cloudflare Access 保护
 
 ## 部署模型
@@ -13,7 +13,7 @@
 
 - Astro 生成 `dist/`
 - Cloudflare Pages 托管静态页面
-- Cloudflare Pages Functions 负责访问拦截、token 校验与后台接口
+- Cloudflare Pages Functions 负责访问拦截、短码校验与后台接口
 - Cloudflare D1 保存 `invite_tokens`、`sessions` 与 `auth_rate_limits`
 - Cloudflare Access 负责后台入口认证
 
@@ -74,7 +74,7 @@ npx wrangler d1 execute "lies-resumefoundry-auth" --remote --file "database/sche
 其中：
 
 - `invite_tokens`
-  保存 token 哈希、跳转路径、模式、过期时间、使用次数与后台管理字段
+  保存短码哈希、跳转路径、模式、过期时间、使用次数与后台管理字段
 - `sessions`
   保存服务端 session
 - `auth_rate_limits`
@@ -118,7 +118,7 @@ resume_session
 
 ### `AUTH_QR_DEFAULT_TTL_SECONDS`
 
-默认 token 生命周期，单位为秒。默认值为 15 分钟：
+默认短码生命周期，单位为秒。默认值为 15 分钟：
 
 ```text
 900
@@ -303,22 +303,22 @@ https://<your-domain><ADMIN_BASE_PATH>
 - 未登录时进入 Cloudflare Access 校验
 - 通过后进入后台控制台
 
-### 4. 后台 token 管理应可用
+### 4. 后台短码管理应可用
 
 建议验证：
 
-- 创建 token
+- 创建短码
 - 复制邀请链接
 - 使用链接完成 unlock
-- 禁用 token
-- 启用 token
-- 延长 token
-- 增加限次 token 的次数额度
+- 禁用短码
+- 启用短码
+- 延长短码
+- 增加限次短码的次数额度
 - 禁用时吊销关联 session
 
 ### 5. `/auth/qr` 限流应生效
 
-连续提交错误 token，确认达到阈值后页面出现“尝试次数较多”的提示。
+连续提交错误短码，确认达到阈值后页面出现限流提示。
 
 ## 常见问题
 
@@ -343,4 +343,4 @@ https://<your-domain><ADMIN_BASE_PATH>
 
 - `AUTH_QR_RATE_LIMIT_MAX_ATTEMPTS`
 - `AUTH_QR_RATE_LIMIT_WINDOW_SECONDS`
-- 是否存在错误脚本或异常请求持续提交无效 token
+- 是否存在错误脚本或异常请求持续提交无效短码

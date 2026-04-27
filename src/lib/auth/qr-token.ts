@@ -1,3 +1,10 @@
+export const QR_TOKEN_BYTE_LENGTH = 10;
+export const QR_TOKEN_MIN_LENGTH = 14;
+export const QR_TOKEN_MAX_LENGTH = 256;
+export const QR_TOKEN_PATTERN_SOURCE = `[A-Za-z0-9_-]{${QR_TOKEN_MIN_LENGTH},${QR_TOKEN_MAX_LENGTH}}`;
+
+const QR_TOKEN_PATTERN = new RegExp(`^${QR_TOKEN_PATTERN_SOURCE}$`);
+
 function bytesToBase64Url(bytes: Uint8Array) {
   let binary = '';
 
@@ -12,10 +19,10 @@ function bytesToBase64Url(bytes: Uint8Array) {
 }
 
 function isLikelyToken(value: string) {
-  return /^[A-Za-z0-9_-]{24,256}$/.test(value);
+  return QR_TOKEN_PATTERN.test(value);
 }
 
-export function createQrToken(size = 32) {
+export function createQrToken(size = QR_TOKEN_BYTE_LENGTH) {
   const bytes = new Uint8Array(size);
   crypto.getRandomValues(bytes);
   return bytesToBase64Url(bytes);

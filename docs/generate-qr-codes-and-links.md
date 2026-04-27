@@ -1,10 +1,10 @@
 # 使用脚本生成二维码与邀请链接
 
-本文说明如何使用项目自带脚本生成二维码与邀请链接，并明确脚本与后台 token 管理控制台的职责边界。
+本文说明如何使用项目自带脚本生成二维码与邀请链接，并明确脚本与后台短码管理控制台的职责边界。
 
 ## 使用方式概览
 
-项目提供两种 token 发放方式：
+项目提供两种短码发放方式：
 
 - 后台控制台
   适合人工发放、禁用、启用、延长与追加次数
@@ -13,17 +13,17 @@
 
 两者写入同一份 D1 数据，因此：
 
-- 脚本生成的 token 可以在后台控制台中继续管理
-- 后台对 token 的禁用、启用、延长或追加次数会立即影响脚本创建的链接
+- 脚本生成的短码可以在后台控制台中继续管理
+- 后台对短码的禁用、启用、延长或追加次数会立即影响脚本创建的链接
 
 ## 脚本职责
 
 发码脚本执行以下工作：
 
-1. 生成高强度随机 token
-2. 计算 token 的 SHA-256 哈希
-3. 将 token 元数据写入 D1
-4. 生成带 `#t=...` 片段的邀请链接
+1. 生成高强度随机短码
+2. 计算短码的 SHA-256 哈希
+3. 将短码元数据写入 D1
+4. 生成带 `#...` 片段的邀请链接
 5. 输出二维码 SVG 文件
 
 ## 先决条件
@@ -72,7 +72,7 @@ npm run issue-qr -- \
 
 - 写入远程 D1
 - 模式为 `single_use`
-- token 有效期为 15 分钟
+- 短码有效期为 15 分钟
 - session 策略为 `fixed_ttl`
 - session 有效期为 14 天
 - 跳转目标为 `/`
@@ -92,7 +92,7 @@ npm run issue-qr -- \
 - 二维码文件路径
 - 邀请链接
 - 访问模式
-- token 有效期与过期时间
+- 短码有效期与过期时间
 - session 策略与会话时长
 - 可选备注
 
@@ -105,14 +105,15 @@ generated-qr/invite-20260420-212530.svg
 生成的邀请链接格式类似：
 
 ```text
-https://resume.example.com/unlock?next=%2Fresume%2Fai-platform#t=<token>
+https://resume.example.com/#<code>
 ```
 
 说明：
 
-- `#t=<token>` 位于 URL fragment 中，不会进入服务端请求 URL
-- D1 中保存的是 `token_hash`，不是明文 token
-- token 的最终跳转目标以数据库中的 `next_path` 为准
+- `#<code>` 位于 URL fragment 中，不会进入服务端请求 URL
+- 根页面会将短码 fragment 转发到 `/unlock` 完成验证
+- D1 中保存的是 `token_hash`，不是明文短码
+- 短码的最终跳转目标以数据库中的 `next_path` 为准
 
 ## 参数说明
 
@@ -157,7 +158,7 @@ https://resume.example.com/unlock?next=%2Fresume%2Fai-platform#t=<token>
 
 ### `--mode`
 
-指定 token 模式。支持：
+指定短码模式。支持：
 
 - `single_use`
 - `reusable_until_expire`
@@ -193,7 +194,7 @@ https://resume.example.com/unlock?next=%2Fresume%2Fai-platform#t=<token>
 
 ### `--ttl-minutes`
 
-指定 token 本身的有效期，单位为分钟。
+指定短码本身的有效期，单位为分钟。
 
 示例：
 
@@ -203,18 +204,18 @@ https://resume.example.com/unlock?next=%2Fresume%2Fai-platform#t=<token>
 
 ### `--session-policy`
 
-指定通过 token 创建 session 时采用的策略。支持：
+指定通过短码创建 session 时采用的策略。支持：
 
 - `fixed_ttl`
 - `cap_to_invite_expiry`
 
 #### `fixed_ttl`
 
-session 按自身 TTL 独立过期，与 token 剩余寿命无关。
+session 按自身 TTL 独立过期，与短码剩余寿命无关。
 
 #### `cap_to_invite_expiry`
 
-session 的最终过期时间不会晚于 token 过期时间。
+session 的最终过期时间不会晚于短码过期时间。
 
 ### `--session-ttl-minutes`
 
@@ -307,7 +308,7 @@ npm run issue-qr -- \
 
 - 自动化发码使用脚本
 - 日常人工管理使用后台控制台
-- 脚本输出的明文 token 不应再写入仓库文档或长期保存在命令历史中
+- 脚本输出的明文短码不应再写入仓库文档或长期保存在命令历史中
 
 ## 备注
 

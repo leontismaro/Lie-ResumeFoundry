@@ -12,6 +12,7 @@ const DEFAULT_TTL_MINUTES = Number.parseInt(process.env.AUTH_QR_DEFAULT_TTL_MINU
 const DEFAULT_SESSION_TTL_MINUTES = Number.parseInt(process.env.AUTH_SESSION_TTL_MINUTES ?? '20160', 10);
 const DEFAULT_MODE = 'single_use';
 const DEFAULT_SESSION_POLICY = 'fixed_ttl';
+const DEFAULT_QR_TOKEN_BYTES = 10;
 
 const VALID_MODES = new Set(['single_use', 'reusable_until_expire', 'limited_uses']);
 const VALID_SESSION_POLICIES = new Set(['fixed_ttl', 'cap_to_invite_expiry']);
@@ -133,8 +134,8 @@ function base64UrlEncode(buffer) {
     .replace(/=+$/g, '');
 }
 
-function createToken() {
-  return base64UrlEncode(crypto.randomBytes(32));
+function createToken(size = DEFAULT_QR_TOKEN_BYTES) {
+  return base64UrlEncode(crypto.randomBytes(size));
 }
 
 function hashToken(token) {
@@ -318,9 +319,8 @@ async function main() {
 
   executeWrangler(options.database, buildInviteSql(record), options.remote);
 
-  const authUrl = new URL('/unlock', baseUrl);
-  authUrl.searchParams.set('next', options.next);
-  authUrl.hash = new URLSearchParams({ t: token }).toString();
+  const authUrl = new URL('/', baseUrl);
+  authUrl.hash = token;
 
   const svg = await QRCode.toString(authUrl.toString(), {
     margin: 1,

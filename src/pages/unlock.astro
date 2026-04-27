@@ -1,4 +1,5 @@
 ---
+import { QR_TOKEN_MAX_LENGTH, QR_TOKEN_MIN_LENGTH, QR_TOKEN_PATTERN_SOURCE } from '../lib/auth/qr-token';
 import { withBase } from '../lib/site';
 
 const pageTitle = '验证访问权限';
@@ -146,7 +147,7 @@ const pageTitle = '验证访问权限';
       <p>Private Resume</p>
       <h1>访问前验证</h1>
       <p class="lead">
-        该页面需要访问密码后方可查看，扫描二维码或输入访问密码后即可继续访问。
+        扫描二维码或输入访问短码后继续访问。
       </p>
 
       <section class="stack">
@@ -157,7 +158,7 @@ const pageTitle = '验证访问权限';
           <input type="hidden" name="next" id="nextField" value="/" />
 
           <div class="stack">
-            <label for="token">访问密码</label>
+            <label for="token">访问短码</label>
             <input
               id="token"
               name="token"
@@ -165,10 +166,10 @@ const pageTitle = '验证访问权限';
               inputmode="text"
               autocomplete="off"
               spellcheck="false"
-              minlength="24"
-              maxlength="256"
-              pattern="[A-Za-z0-9_-]{24,256}"
-              placeholder="请输入访问密码"
+              minlength={QR_TOKEN_MIN_LENGTH}
+              maxlength={QR_TOKEN_MAX_LENGTH}
+              pattern={QR_TOKEN_PATTERN_SOURCE}
+              placeholder="请输入访问短码"
               required
             />
           </div>
@@ -184,7 +185,6 @@ const pageTitle = '验证访问权限';
     <script>
       const params = new URLSearchParams(window.location.search);
       const next = params.get('next');
-      const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
       const error = params.get('error');
       const loggedOut = params.get('logged_out');
       const unlockForm = document.getElementById('unlockForm');
@@ -193,23 +193,38 @@ const pageTitle = '验证访问权限';
       const successNotice = document.getElementById('successNotice');
       const tokenInput = document.getElementById('token');
 
+      function extractFragmentToken(rawValue) {
+        const value = rawValue.replace(/^#/, '').trim();
+        if (!value) {
+          return '';
+        }
+
+        const params = new URLSearchParams(value);
+        return params.get('t') || params.get('token') || value;
+      }
+
       function extractToken(rawValue) {
         const value = rawValue.trim();
         if (!value) {
           return '';
         }
 
+        const directParams = new URLSearchParams(value.replace(/^[?#]/, ''));
+        const directToken = directParams.get('t') || directParams.get('token');
+        if (directToken) {
+          return directToken;
+        }
+
         try {
-          const url = new URL(value);
-          const hash = new URLSearchParams(url.hash.replace(/^#/, ''));
-          return url.searchParams.get('t') || url.searchParams.get('token') || hash.get('t') || hash.get('token') || value;
+          const url = new URL(value, window.location.origin);
+          return url.searchParams.get('t') || url.searchParams.get('token') || extractFragmentToken(url.hash) || value;
         } catch {
           const match = value.match(/[?#&](?:t|token)=([^&#]+)/i);
           if (match && match[1]) {
             return decodeURIComponent(match[1]);
           }
 
-          return value;
+          return value.startsWith('#') ? extractFragmentToken(value) : value;
         }
       }
 
@@ -217,55 +232,31 @@ const pageTitle = '验证访问权限';
         nextField.value = next;
       }
 
-      const tokenFromHash = extractToken(hashParams.get('t') || hashParams.get('token') || '');
+      const tokenFromHash = extractToken(window.location.hash);
       if (tokenFromHash) {
         tokenInput.value = tokenFromHash;
         window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}`);
         unlockForm.requestSubmit();
       }
 
-      if (error === 'missing-token') {
-        errorNotice.textContent = '缺少访问密码。请重新扫码，或输入有效的访问密码后再试。';
-        errorNotice.style.display = 'block';
-      }
-
-      if (error === 'invalid-token') {
-        errorNotice.textContent = '当前访问信息暂时无法继续使用。请联系发送方重新发送最新链接。';
-        errorNotice.style.display = 'block';
-      }
-
-      if (error === 'expired-token') {
-        errorNotice.textContent = '当前访问链接已过期。请联系发送方重新获取最新链接。';
-        errorNotice.style.display = 'block';
-      }
-
-      if (error === 'disabled-token') {
-        errorNotice.textContent = '当前访问信息暂时无法继续使用。请联系发送方重新发送最新链接。';
-        errorNotice.style.display = 'block';
-      }
-
-      if (error === 'already-used-token') {
-        errorNotice.textContent = '当前访问信息暂时无法继续使用。请联系发送方重新发送最新链接。';
-        errorNotice.style.display = 'block';
-      }
-
-      if (error === 'usage-limit-reached') {
-        errorNotice.textContent = '当前访问次数已用完。请联系发送方获取新的访问链接。';
-        errorNotice.style.display = 'block';
-      }
-
-      if (error === 'token-config-error') {
-        errorNotice.textContent = '当前访问信息暂时无法继续使用。请联系发送方重新发送最新链接。';
-        errorNotice.style.display = 'block';
-      }
-
-      if (error === 'too-many-attempts') {
-        errorNotice.textContent = '尝试次数较多，当前验证已暂时受限。请稍后再试，或联系发送方获取协助。';
+      const errorMessages = {
+        'already-used-token': '短码不可用。请联系发送方更新链接。',
+        'disabled-token': '短码不可用。请联系发送方更新链接。',
+        'expired-token': '短码已过期。请联系发送方更新链接。',
+        'invalid-token': '短码不可用。请联系发送方更新链接。',
+        'missing-token': '缺少访问短码。请重新扫码或输入有效短码。',
+        'token-config-error': '短码不可用。请联系发送方更新链接。',
+        'too-many-attempts': '验证次数过多。请稍后再试。',
+        'usage-limit-reached': '访问次数已用完。请联系发送方更新链接。',
+      };
+      const errorMessage = errorMessages[error];
+      if (errorMessage) {
+        errorNotice.textContent = errorMessage;
         errorNotice.style.display = 'block';
       }
 
       if (loggedOut === '1') {
-        successNotice.textContent = '当前浏览器中的访问状态已清除，如需继续查看，可重新输入访问密码或打开专属链接。';
+        successNotice.textContent = '当前会话已清除。可重新输入短码或打开专属链接。';
         successNotice.style.display = 'block';
       }
 

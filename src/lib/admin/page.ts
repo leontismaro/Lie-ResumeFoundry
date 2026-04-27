@@ -25,7 +25,7 @@ export function renderAdminPage(config: AdminConfig, identity: AdminIdentity, ro
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex,nofollow,noarchive,nosnippet" />
-    <title>后台 Token 管理</title>
+    <title>后台短码管理</title>
     <style>
       :root {
         color-scheme: light;
@@ -591,8 +591,8 @@ export function renderAdminPage(config: AdminConfig, identity: AdminIdentity, ro
         <div class="hero-top">
           <div>
             <p class="muted">Cloudflare Access Protected Console</p>
-            <h1>二维码 / Token 管理台</h1>
-            <p class="muted">当前后台路径已受 Cloudflare Access 保护。新 token 生成后只会展示一次明文，请立即复制或下载二维码。</p>
+            <h1>二维码 / 短码管理台</h1>
+            <p class="muted">当前后台路径已受 Cloudflare Access 保护。新短码生成后只会展示一次明文，请立即复制或下载二维码。</p>
           </div>
           <div class="muted">当前管理员：${actorEmail}</div>
         </div>
@@ -607,7 +607,7 @@ export function renderAdminPage(config: AdminConfig, identity: AdminIdentity, ro
 
       <section class="workspace">
         <section class="panel">
-          <h2>新建 Token</h2>
+          <h2>新建短码</h2>
           <form id="createForm">
             <div class="field">
               <label for="nextPath">目标路径</label>
@@ -639,7 +639,7 @@ export function renderAdminPage(config: AdminConfig, identity: AdminIdentity, ro
 
             <div class="field-row">
               <div class="field">
-                <label for="ttlPreset">Token 有效期</label>
+                <label for="ttlPreset">短码有效期</label>
                 <div class="field-stack">
                   <select id="ttlPreset" name="ttlPreset">
                     <option value="15">15 分钟</option>
@@ -677,7 +677,7 @@ export function renderAdminPage(config: AdminConfig, identity: AdminIdentity, ro
               </select>
             </div>
 
-            <button type="submit">生成 Token</button>
+            <button type="submit">生成短码</button>
           </form>
         </section>
 
@@ -687,14 +687,14 @@ export function renderAdminPage(config: AdminConfig, identity: AdminIdentity, ro
             <div class="flash" id="flash"></div>
           </div>
           <div class="result-card" id="resultCard">
-            <p class="muted">创建成功后，这里会显示一次性的明文 token、解锁链接和二维码 SVG 预览。</p>
+            <p class="muted">创建成功后，这里会显示一次性明文短码、解锁链接和二维码预览。</p>
           </div>
         </section>
       </section>
 
       <section class="panel" style="margin-top: 18px;">
         <div class="toolbar">
-          <h2>Token 列表</h2>
+          <h2>短码列表</h2>
           <div class="toolbar-group">
             <select id="statusFilter">
               <option value="all">全部状态</option>
@@ -722,7 +722,7 @@ export function renderAdminPage(config: AdminConfig, identity: AdminIdentity, ro
             <tbody id="tokenRows"></tbody>
           </table>
         </div>
-        <div class="empty" id="emptyState" hidden>当前没有符合条件的 token。</div>
+        <div class="empty" id="emptyState" hidden>当前没有符合条件的短码。</div>
       </section>
     </main>
 
@@ -747,7 +747,7 @@ export function renderAdminPage(config: AdminConfig, identity: AdminIdentity, ro
           <div class="field" id="modalRevokeField" hidden>
             <label class="checkbox-row" for="modalRevokeSessions">
               <input id="modalRevokeSessions" type="checkbox" />
-              <span>同时吊销该 token 已创建的所有 session</span>
+              <span>同时吊销该短码已创建的所有 session</span>
             </label>
           </div>
 
@@ -1049,14 +1049,14 @@ export function renderAdminPage(config: AdminConfig, identity: AdminIdentity, ro
       }
 
       async function loadTokens() {
-        setFlash('正在加载 token 列表...', '');
+        setFlash('正在加载短码列表...', '');
         const response = await fetch(ADMIN_BASE_PATH + '/api/tokens', {
           headers: { Accept: 'application/json' },
         });
         const payload = await response.json();
 
         if (!response.ok) {
-          throw new Error(payload.error || '加载 token 失败');
+          throw new Error(payload.error || '加载短码失败');
         }
 
         loadedItems = payload.items || [];
@@ -1076,10 +1076,10 @@ export function renderAdminPage(config: AdminConfig, identity: AdminIdentity, ro
       function renderCreateResult(payload) {
         const qrSvg = payload.qrSvg || '';
         resultCard.innerHTML = [
-          '<div><strong>明文 Token</strong><pre>' + escapeHtml(payload.token) + '</pre></div>',
+          '<div><strong>访问短码</strong><pre>' + escapeHtml(payload.token) + '</pre></div>',
           '<div><strong>解锁链接</strong><pre>' + escapeHtml(payload.unlockUrl) + '</pre></div>',
           '<div class="result-actions">' +
-            '<button class="secondary" type="button" id="copyTokenButton">复制 Token</button>' +
+            '<button class="secondary" type="button" id="copyTokenButton">复制短码</button>' +
             '<button class="secondary" type="button" id="copyLinkButton">复制链接</button>' +
             '<button class="secondary" type="button" id="downloadQrButton">下载 SVG</button>' +
           '</div>',
@@ -1139,8 +1139,8 @@ export function renderAdminPage(config: AdminConfig, identity: AdminIdentity, ro
         modalSummary.innerHTML = buildModalSummary(item);
 
         if (action === 'disable') {
-          modalTitle.textContent = '禁用 Token';
-          modalSubtitle.textContent = '禁用后，该 token 将无法继续兑换新的 session。';
+          modalTitle.textContent = '禁用短码';
+          modalSubtitle.textContent = '禁用后，该短码将无法继续兑换新的 session。';
           modalReasonField.hidden = false;
           modalRevokeField.hidden = false;
           modalConfirmButton.textContent = '确认禁用';
@@ -1149,7 +1149,7 @@ export function renderAdminPage(config: AdminConfig, identity: AdminIdentity, ro
 
         if (action === 'extend') {
           modalTitle.textContent = '延长有效期';
-          modalSubtitle.textContent = '只调整 token 的过期时间，不影响已有 session。';
+          modalSubtitle.textContent = '只调整短码的过期时间，不影响已有 session。';
           modalExtendField.hidden = false;
           modalConfirmButton.textContent = '确认延长';
           modalConfirmButton.className = '';
@@ -1164,8 +1164,8 @@ export function renderAdminPage(config: AdminConfig, identity: AdminIdentity, ro
         }
 
         if (action === 'enable') {
-          modalTitle.textContent = '启用 Token';
-          modalSubtitle.textContent = '启用后，该 token 可以再次兑换新的 session。';
+          modalTitle.textContent = '启用短码';
+          modalSubtitle.textContent = '启用后，该短码可以再次兑换新的 session。';
           modalConfirmButton.textContent = '确认启用';
           modalConfirmButton.className = '';
         }
@@ -1199,7 +1199,7 @@ export function renderAdminPage(config: AdminConfig, identity: AdminIdentity, ro
             reason: modalReason.value.trim(),
             revokeSessions: modalRevokeSessions.checked,
           };
-          successMessage = 'Token 已禁用';
+          successMessage = '短码已禁用';
         }
 
         if (modalState.action === 'extend') {
@@ -1214,7 +1214,7 @@ export function renderAdminPage(config: AdminConfig, identity: AdminIdentity, ro
           payload = {
             extendMinutes: Math.floor(extendMinutes),
           };
-          successMessage = 'Token 已延长';
+          successMessage = '短码已延长';
         }
 
         if (modalState.action === 'add-uses') {
@@ -1229,13 +1229,13 @@ export function renderAdminPage(config: AdminConfig, identity: AdminIdentity, ro
           payload = {
             additionalUses: Math.floor(additionalUses),
           };
-          successMessage = 'Token 可用次数已增加';
+          successMessage = '短码可用次数已增加';
         }
 
         if (modalState.action === 'enable') {
           endpoint = '/enable';
           payload = {};
-          successMessage = 'Token 已启用';
+          successMessage = '短码已启用';
         }
 
         const response = await fetch(ADMIN_BASE_PATH + '/api/tokens/' + modalState.item.id + endpoint, {
@@ -1262,7 +1262,7 @@ export function renderAdminPage(config: AdminConfig, identity: AdminIdentity, ro
 
       createForm.addEventListener('submit', async function(event) {
         event.preventDefault();
-        setFlash('正在生成 token...', '');
+        setFlash('正在生成短码...', '');
         const formData = new FormData(createForm);
         const payload = {
           maxUses: formData.get('maxUses') ? Number(formData.get('maxUses')) : null,
@@ -1285,12 +1285,12 @@ export function renderAdminPage(config: AdminConfig, identity: AdminIdentity, ro
         const result = await response.json();
 
         if (!response.ok) {
-          setFlash(result.error || '生成 token 失败', 'error');
+          setFlash(result.error || '生成短码失败', 'error');
           return;
         }
 
         renderCreateResult(result);
-        setFlash('Token 已创建，明文只展示这一次。', 'success');
+        setFlash('短码已创建，明文只展示这一次。', 'success');
         await loadTokens();
       });
 
@@ -1308,7 +1308,7 @@ export function renderAdminPage(config: AdminConfig, identity: AdminIdentity, ro
 
         const item = getInviteById(inviteId);
         if (!item) {
-          setFlash('未找到对应 token，请先刷新列表。', 'error');
+          setFlash('未找到对应短码，请先刷新列表。', 'error');
           return;
         }
 

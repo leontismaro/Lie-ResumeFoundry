@@ -94,7 +94,7 @@ type ReadInviteTokenResult =
 
 export function getAuthDatabase(binding: unknown) {
   if (!binding || typeof binding !== 'object' || !('prepare' in binding)) {
-    throw new Error('缺少 AUTH_DB 绑定，无法校验二维码 token。');
+    throw new Error('缺少 AUTH_DB 绑定，无法校验访问短码。');
   }
 
   return binding as D1DatabaseLike;

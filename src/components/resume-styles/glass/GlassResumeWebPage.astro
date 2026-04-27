@@ -3,6 +3,7 @@ import ResumeNav from '../../ResumeNav.astro';
 import ResumeSection from '../../ResumeSection.astro';
 import SummaryPills from '../../SummaryPills.astro';
 import ProfileMetaGrid from '../../ProfileMetaGrid.astro';
+import InviteFragmentRedirect from '../../InviteFragmentRedirect.astro';
 import {
   joinResumeSummary,
   normalizeResumeSummary,
@@ -44,9 +45,10 @@ interface Props {
   primarySection?: ResumeEntry | null;
   kicker?: string;
   printHref: string;
+  redirectInviteFragment?: boolean;
 }
 
-const { hero, navItems, sections, primarySection, kicker, printHref } = Astro.props;
+const { hero, navItems, sections, primarySection, kicker, printHref, redirectInviteFragment = false } = Astro.props;
 const heroSummaryText =
   typeof hero.data.summary === 'string' ? joinResumeSummary(hero.data.summary) : undefined;
 const heroSummaryItems =
@@ -69,6 +71,7 @@ const canonicalUrl = getCanonicalUrl(Astro.url, Astro.site);
     {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
     <link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
     <link rel="icon" href={withBase('/favicon.ico')} />
+    <InviteFragmentRedirect enabled={redirectInviteFragment} unlockPath={withBase('/unlock')} />
     <title>{hero.data.title} | 简历</title>
   </head>
   <body class="glass-web-body">

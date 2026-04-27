@@ -80,7 +80,7 @@ function normalizeInviteMode(mode: string): InviteMode {
     return mode;
   }
 
-  throw new Error(`未知 token 模式: ${mode}`);
+  throw new Error(`未知短码模式: ${mode}`);
 }
 
 function normalizeSessionPolicy(value: string): SessionPolicy {
@@ -173,10 +173,9 @@ function normalizeMinutes(value: number, field: string) {
   throw new Error(`${field} 必须是大于 0 的整数分钟数。`);
 }
 
-function buildUnlockUrl(baseUrl: string, nextPath: string, token: string) {
-  const url = new URL('/unlock', baseUrl);
-  url.searchParams.set('next', nextPath);
-  url.hash = new URLSearchParams({ t: token }).toString();
+function buildUnlockUrl(baseUrl: string, token: string) {
+  const url = new URL('/', baseUrl);
+  url.hash = token;
   return url.toString();
 }
 
@@ -316,13 +315,13 @@ export async function createAdminInvite(
     )
     .run();
 
-  const unlockUrl = buildUnlockUrl(input.baseUrl, nextPath, token);
+  const unlockUrl = buildUnlockUrl(input.baseUrl, token);
   const qrSvg = await buildQrSvg(unlockUrl);
   const { invites } = await listAdminInvites(db, now);
   const invite = invites.find((item: AdminInvite) => item.id === inviteId);
 
   if (!invite) {
-    throw new Error('创建 token 后未能读取记录。');
+    throw new Error('创建短码后未能读取记录。');
   }
 
   return {
@@ -386,7 +385,7 @@ export async function extendAdminInvite(
   }
 
   if (isSingleUseConsumed(row)) {
-    throw new Error('一次性且已使用的 token 不允许延长有效期。');
+    throw new Error('一次性且已使用的短码不允许延长有效期。');
   }
 
   const nextExpiresAt = Math.max(row.expires_at, now) + minutes * 60;
@@ -429,12 +428,12 @@ export async function addAdminInviteUses(
   }
 
   if (row.mode !== 'limited_uses') {
-    throw new Error('只有次数限制模式的 token 才允许增加可用次数。');
+    throw new Error('只有次数限制模式的短码才允许增加可用次数。');
   }
 
   const currentMaxUses = normalizePositiveInt(row.max_uses);
   if (!currentMaxUses) {
-    throw new Error('当前 token 缺少可用次数配置。');
+    throw new Error('当前短码缺少可用次数配置。');
   }
 
   const result = await db
@@ -485,19 +484,19 @@ export async function enableAdminInvite(db: D1DatabaseLike, inviteId: string, no
   }
 
   if (!row.disabled_at) {
-    throw new Error('当前 token 未处于禁用状态。');
+    throw new Error('当前短码未处于禁用状态。');
   }
 
   if (row.expires_at <= now) {
-    throw new Error('已过期 token 不能直接启用，请先延长有效期。');
+    throw new Error('已过期短码不能直接启用，请先延长有效期。');
   }
 
   if (isSingleUseConsumed(row)) {
-    throw new Error('一次性且已使用的 token 不允许重新启用。');
+    throw new Error('一次性且已使用的短码不允许重新启用。');
   }
 
   if (!hasRemainingUses(row)) {
-    throw new Error('次数已用尽的 token 不能直接启用，请先增加次数。');
+    throw new Error('次数已用尽的短码不能直接启用，请先增加次数。');
   }
 
   const result = await db

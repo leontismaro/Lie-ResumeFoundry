@@ -182,7 +182,7 @@ export async function handleAdminRequest(context: PagesContext) {
       });
     } catch (error) {
       return buildJsonResponse(400, {
-        error: error instanceof Error ? error.message : '创建 token 失败。',
+        error: error instanceof Error ? error.message : '创建短码失败。',
       });
     }
   }
@@ -200,7 +200,7 @@ export async function handleAdminRequest(context: PagesContext) {
 
       if (!changed) {
         return buildJsonResponse(404, {
-          error: '未找到可禁用的 token，或该 token 已经处于禁用状态。',
+          error: '未找到可禁用的短码，或该短码已经处于禁用状态。',
         });
       }
 
@@ -215,7 +215,7 @@ export async function handleAdminRequest(context: PagesContext) {
       });
     } catch (error) {
       return buildJsonResponse(400, {
-        error: error instanceof Error ? error.message : '禁用 token 失败。',
+        error: error instanceof Error ? error.message : '禁用短码失败。',
       });
     }
   }
@@ -233,7 +233,7 @@ export async function handleAdminRequest(context: PagesContext) {
 
       if (!changed) {
         return buildJsonResponse(404, {
-          error: '未找到需要延长的 token。',
+          error: '未找到需要延长的短码。',
         });
       }
 
@@ -244,7 +244,7 @@ export async function handleAdminRequest(context: PagesContext) {
       });
     } catch (error) {
       return buildJsonResponse(400, {
-        error: error instanceof Error ? error.message : '延长 token 失败。',
+        error: error instanceof Error ? error.message : '延长短码失败。',
       });
     }
   }
@@ -262,7 +262,7 @@ export async function handleAdminRequest(context: PagesContext) {
 
       if (!changed) {
         return buildJsonResponse(404, {
-          error: '未找到需要增加次数的 token。',
+          error: '未找到需要增加次数的短码。',
         });
       }
 
@@ -290,7 +290,7 @@ export async function handleAdminRequest(context: PagesContext) {
 
       if (!changed) {
         return buildJsonResponse(404, {
-          error: '未找到需要启用的 token。',
+          error: '未找到需要启用的短码。',
         });
       }
 
@@ -301,7 +301,7 @@ export async function handleAdminRequest(context: PagesContext) {
       });
     } catch (error) {
       return buildJsonResponse(400, {
-        error: error instanceof Error ? error.message : '启用 token 失败。',
+        error: error instanceof Error ? error.message : '启用短码失败。',
       });
     }
   }
